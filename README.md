@@ -1,20 +1,27 @@
-# Sito Portfolio
+# Sito Portfolio — Videomaker &amp; Photographer
 
-Prima versione statica del sito portfolio per un videomaker e fotografo.
+Sito statico (HTML/CSS/JS puro, senza build) per un videomaker e fotografo.
 
 ## Struttura
 
-- `index.html`: contenuti della pagina, portfolio, contatti e link social.
-- `styles.css`: layout, responsive design e stile visivo.
-- `script.js`: carosello automatico con 9 immagini, 3 visibili alla volta.
-- `assets/hero/studio-hero.png`: immagine temporanea del banner.
-- `assets/gallery/`: immagini temporanee del carosello.
+- `index.html` — contenuti: hero, carosello, portfolio, contatti, social.
+- `styles.css` — layout, tema cinematografico, responsive e reduced-motion.
+- `script.js` — carosello "revolver" (9 immagini, 3 visibili, scorrimento infinito), header dinamico, reveal allo scroll.
+- `assets/hero/studio-hero.png` — immagine del banner (sostituibile con foto o video).
+- `assets/gallery/` — 9 immagini del carosello (placeholder da sostituire).
+- `vercel.json` — configurazione per il deploy su Vercel.
 
-## Da personalizzare
+## Cosa personalizzare
 
-1. Sostituire le 9 immagini in `assets/gallery/` mantenendo i nomi esistenti, oppure aggiornare la lista `galleryImages` in `script.js`.
-2. Sostituire email, telefono e partita IVA nella sezione `Contatti` di `index.html`.
-3. Inserire i link reali Instagram e TikTok nei pulsanti in fondo a sinistra.
-4. Sostituire il banner `assets/hero/studio-hero.png` con una foto o un video personale.
+1. **Foto del carosello** — sostituisci le 9 immagini in `assets/gallery/` mantenendo gli stessi nomi, oppure aggiorna la lista `galleryImages` in `script.js` (src, alt, tag, title).
+2. **Banner** — sostituisci `assets/hero/studio-hero.png`. Per usare un **video** al posto della foto, in `index.html` c'è già il markup pronto da scommentare (`<video autoplay muted loop playsinline>`).
+3. **Contatti** — in `index.html`, sezione `#contatti`: aggiorna email, telefono e partita IVA.
+4. **Social** — nella `social-dock` in fondo a sinistra, inserisci i link reali di Instagram e TikTok.
+5. **Nome/brand** — aggiorna "Francesco Garonfolo" nell'header, nell'hero e nel footer.
 
-Il sito puo essere pubblicato direttamente con GitHub Pages dalla branch `main`.
+## Pubblicazione
+
+- **Vercel**: import del repo → deploy automatico (usa `vercel.json`).
+- **GitHub Pages**: pubblica dalla branch dei sorgenti, root del progetto.
+
+Nessuna dipendenza da installare: basta aprire `index.html`.

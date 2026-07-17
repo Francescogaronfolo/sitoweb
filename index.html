@@ -3,107 +3,185 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c0d0c" />
     <meta
       name="description"
-      content="Portfolio video e fotografico di Francesco Garonfolo: wedding film, videoclip, eventi, brand story e contenuti commerciali."
+      content="Francesco Garonfolo — videomaker e fotografo. Wedding film, videoclip, eventi, brand story, riprese drone e fotografia editoriale con taglio cinematografico."
     />
-    <title>Francesco Garonfolo | Videomaker & Photographer</title>
+    <meta property="og:title" content="Francesco Garonfolo | Videomaker & Photographer" />
+    <meta property="og:description" content="Immagini, film e contenuti visivi con taglio cinematografico." />
+    <meta property="og:type" content="website" />
+    <title>Francesco Garonfolo | Videomaker &amp; Photographer</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
-  <body>
+  <body id="top">
+    <a class="skip-link" href="#portfolio">Salta al portfolio</a>
+
     <header class="site-header" aria-label="Intestazione">
-      <a class="brand" href="#top" aria-label="Torna in alto">
-        <span>Francesco Garonfolo</span>
+      <a class="brand" href="#top" aria-label="Francesco Garonfolo — torna in alto">
+        Francesco&nbsp;Garonfolo
       </a>
       <nav class="main-nav" aria-label="Navigazione principale">
         <a href="#portfolio">Portfolio</a>
+        <a href="#lavori">Lavori</a>
         <a href="#contatti">Contatti</a>
       </nav>
     </header>
 
-    <main id="top">
+    <main>
+      <!-- ============ HERO ============ -->
       <section class="hero" aria-label="Banner principale">
-        <img class="hero-media" src="assets/hero/studio-hero.png" alt="" onerror="this.hidden = true" />
-        <div class="hero-shade"></div>
-        <div class="hero-copy">
-          <p class="eyebrow">Videomaker & Photographer</p>
-          <h1>Francesco Garonfolo</h1>
-          <p>
+        <div class="hero-bg">
+          <!--
+            Per usare un VIDEO al posto della foto, sostituisci l'<img> qui sotto con:
+            <video class="hero-media" autoplay muted loop playsinline poster="assets/hero/studio-hero.png">
+              <source src="assets/hero/showreel.mp4" type="video/mp4" />
+            </video>
+          -->
+          <img
+            class="hero-media"
+            src="assets/hero/studio-hero.png"
+            alt=""
+            aria-hidden="true"
+            onerror="this.style.display='none'"
+          />
+        </div>
+        <div class="hero-scrim" aria-hidden="true"></div>
+
+        <div class="hero-inner">
+          <p class="eyebrow">Videomaker &amp; Photographer</p>
+          <h1 class="hero-title">Francesco Garonfolo</h1>
+          <p class="hero-lead">
             Immagini, film e contenuti visivi costruiti con taglio cinematografico,
             ritmo e attenzione al dettaglio.
           </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#portfolio">Guarda i lavori</a>
+            <a class="btn btn-ghost" href="#contatti">Contattami</a>
+          </div>
         </div>
+
+        <!-- La scritta "Portfolio" che sbuca nella pagina di apertura -->
+        <a class="hero-peek" href="#portfolio" aria-label="Vai al portfolio">
+          <span>Portfolio</span>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+            <path d="M12 5v14M5 12l7 7 7-7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
       </section>
 
+      <!-- ============ CAROUSEL (3 visibili su 9) ============ -->
       <section class="showcase" aria-label="Galleria in evidenza">
-        <div class="carousel-shell">
-          <div class="carousel-track" id="carouselTrack" aria-live="polite"></div>
+        <div class="carousel" id="carousel">
+          <button class="carousel-arrow prev" type="button" aria-label="Immagine precedente">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="carousel-viewport">
+            <div class="carousel-track" id="carouselTrack" aria-live="off"></div>
+          </div>
+          <button class="carousel-arrow next" type="button" aria-label="Immagine successiva">
+            <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
         </div>
+        <div class="carousel-dots" id="carouselDots" role="tablist" aria-label="Seleziona immagine"></div>
       </section>
 
-      <section class="portfolio-peek" aria-label="Invito al portfolio">
-        <a href="#portfolio">Portfolio</a>
-      </section>
-
-      <section class="portfolio" id="portfolio">
-        <div class="section-heading">
+      <!-- ============ PORTFOLIO / LAVORI ============ -->
+      <section class="works" id="portfolio">
+        <div class="section-heading reveal">
           <p class="eyebrow">Lavori selezionati</p>
-          <h2>Portfolio</h2>
+          <h2 id="lavori">Portfolio</h2>
+          <p class="section-sub">
+            Ogni progetto è pensato su misura: dal concept alle riprese, fino al montaggio
+            e alla color. Ecco i formati principali su cui lavoro.
+          </p>
         </div>
 
-        <div class="service-grid" aria-label="Tipi di lavori">
-          <article class="service">
-            <span>01</span>
+        <div class="work-grid" aria-label="Tipi di lavoro">
+          <article class="work reveal">
+            <span class="work-num">01</span>
             <h3>Wedding Film</h3>
             <p>Racconti eleganti, riprese emozionali e montaggi pensati per durare.</p>
           </article>
-          <article class="service">
-            <span>02</span>
+          <article class="work reveal">
+            <span class="work-num">02</span>
             <h3>Eventi</h3>
             <p>Reportage video e fotografici per serate, eventi privati e aziendali.</p>
           </article>
-          <article class="service">
-            <span>03</span>
-            <h3>Brand & Commercial</h3>
-            <p>Contenuti per aziende, attivita locali, campagne social e lanci prodotto.</p>
+          <article class="work reveal">
+            <span class="work-num">03</span>
+            <h3>Brand &amp; Commercial</h3>
+            <p>Contenuti per aziende, attività locali, campagne social e lanci prodotto.</p>
           </article>
-          <article class="service">
-            <span>04</span>
+          <article class="work reveal">
+            <span class="work-num">04</span>
             <h3>Videoclip</h3>
             <p>Concept visivi, riprese dinamiche e post-produzione per artisti e creator.</p>
           </article>
-          <article class="service">
-            <span>05</span>
+          <article class="work reveal">
+            <span class="work-num">05</span>
             <h3>Fotografia</h3>
             <p>Ritratti, shooting editoriali, dettagli prodotto e contenuti lifestyle.</p>
           </article>
-          <article class="service">
-            <span>06</span>
-            <h3>Drone & Reel</h3>
+          <article class="work reveal">
+            <span class="work-num">06</span>
+            <h3>Drone &amp; Reel</h3>
             <p>Riprese aeree e formati verticali pronti per Instagram, TikTok e ADV.</p>
           </article>
         </div>
       </section>
 
+      <!-- ============ CONTATTI ============ -->
       <section class="contact" id="contatti">
-        <div>
+        <div class="contact-head reveal">
           <p class="eyebrow">Disponibile per nuovi progetti</p>
-          <h2>Contatti</h2>
+          <h2>Lavoriamo insieme</h2>
+          <p class="section-sub">
+            Raccontami la tua idea: rispondo a preventivi, collaborazioni e disponibilità.
+          </p>
         </div>
-        <address class="contact-list">
-          <a href="mailto:info@example.com">info@example.com</a>
-          <a href="tel:+390000000000">+39 000 000 0000</a>
-          <span>P. IVA 00000000000</span>
+        <address class="contact-list reveal">
+          <a class="contact-row" href="mailto:info@example.com">
+            <span class="contact-label">Email</span>
+            <span class="contact-value">info@example.com</span>
+          </a>
+          <a class="contact-row" href="tel:+390000000000">
+            <span class="contact-label">Telefono</span>
+            <span class="contact-value">+39 000 000 0000</span>
+          </a>
+          <span class="contact-row">
+            <span class="contact-label">Partita IVA</span>
+            <span class="contact-value">00000000000</span>
+          </span>
         </address>
       </section>
+
+      <footer class="site-footer">
+        <span>© <span id="year"></span> Francesco Garonfolo</span>
+        <span>Videomaker &amp; Photographer</span>
+      </footer>
     </main>
 
-    <aside class="social-dock" aria-label="Social">
-      <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="Apri Instagram">
-        IG
+    <!-- ============ SOCIAL DOCK (in basso a sinistra) ============ -->
+    <aside class="social-dock" aria-label="Profili social">
+      <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Apri Instagram">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.7"/>
+          <circle cx="17.2" cy="6.8" r="1.2" fill="currentColor"/>
+        </svg>
       </a>
-      <a href="https://www.tiktok.com/" target="_blank" rel="noreferrer" aria-label="Apri TikTok">
-        TT
+      <a href="https://www.tiktok.com/" target="_blank" rel="noopener noreferrer" aria-label="Apri TikTok">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+          <path d="M14 3c.3 2.2 1.7 3.9 4 4.2v3c-1.5 0-2.9-.5-4-1.3V15a5.5 5.5 0 1 1-5.5-5.5c.3 0 .6 0 .9.1v3.1a2.5 2.5 0 1 0 1.7 2.4V3H14z" fill="currentColor"/>
+        </svg>
       </a>
     </aside>
 
