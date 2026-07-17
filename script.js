@@ -1,149 +1,201 @@
 "use strict";
 
 /* =========================================================
-   Contenuti della gallery — 9 immagini, 3 visibili alla volta.
-   Sostituisci src/alt/tag/title con i tuoi lavori reali.
+   SERVIZI — ogni voce è una foto del carosello che apre la
+   propria gallery nella lightbox.
+   Per aggiungere più foto a un servizio, riempi "gallery"
+   con altri percorsi immagine (es. tutte le foto di ristorazione).
    ========================================================= */
-const galleryImages = [
-  { src: "assets/gallery/01-wedding-film.jpg",     alt: "Wedding film",        tag: "Video", title: "Wedding Film" },
-  { src: "assets/gallery/02-music-video.jpg",      alt: "Videoclip musicale",  tag: "Video", title: "Music Video" },
-  { src: "assets/gallery/03-brand-story.jpg",      alt: "Brand story",         tag: "Video", title: "Brand Story" },
-  { src: "assets/gallery/04-event-reportage.jpg",  alt: "Reportage evento",    tag: "Video", title: "Event Reportage" },
-  { src: "assets/gallery/05-portrait-session.jpg", alt: "Sessione ritratto",   tag: "Foto",  title: "Portrait Session" },
-  { src: "assets/gallery/06-commercial.jpg",       alt: "Contenuto commerciale", tag: "Video", title: "Commercial" },
-  { src: "assets/gallery/07-drone-view.jpg",       alt: "Riprese drone",       tag: "Drone", title: "Drone View" },
-  { src: "assets/gallery/08-editorial-photo.jpg",  alt: "Fotografia editoriale", tag: "Foto",  title: "Editorial Photo" },
-  { src: "assets/gallery/09-behind-scenes.jpg",    alt: "Backstage",           tag: "Foto",  title: "Behind Scenes" },
+const services = [
+  { cover: "assets/gallery/01-wedding-film.jpg",     tag: "Video", title: "Wedding Film",     desc: "Racconti eleganti, riprese emozionali e montaggi pensati per durare.", gallery: ["assets/gallery/01-wedding-film.jpg"] },
+  { cover: "assets/gallery/02-music-video.jpg",      tag: "Video", title: "Videoclip",        desc: "Concept visivi, riprese dinamiche e post-produzione per artisti e creator.", gallery: ["assets/gallery/02-music-video.jpg"] },
+  { cover: "assets/gallery/03-brand-story.jpg",      tag: "Video", title: "Brand Story",      desc: "Contenuti per aziende, attività locali, campagne social e lanci prodotto.", gallery: ["assets/gallery/03-brand-story.jpg"] },
+  { cover: "assets/gallery/04-event-reportage.jpg",  tag: "Video", title: "Eventi",           desc: "Reportage video e fotografici per serate, eventi privati e aziendali.", gallery: ["assets/gallery/04-event-reportage.jpg"] },
+  { cover: "assets/gallery/05-portrait-session.jpg", tag: "Foto",  title: "Ritratti",         desc: "Ritratti, shooting editoriali e contenuti lifestyle su misura.", gallery: ["assets/gallery/05-portrait-session.jpg"] },
+  { cover: "assets/gallery/06-commercial.jpg",       tag: "Video", title: "Commercial",       desc: "Spot e contenuti pubblicitari per prodotti, servizi e ristorazione.", gallery: ["assets/gallery/06-commercial.jpg"] },
+  { cover: "assets/gallery/07-drone-view.jpg",       tag: "Drone", title: "Drone & Reel",     desc: "Riprese aeree e formati verticali pronti per Instagram, TikTok e ADV.", gallery: ["assets/gallery/07-drone-view.jpg"] },
+  { cover: "assets/gallery/08-editorial-photo.jpg",  tag: "Foto",  title: "Editoriale",       desc: "Fotografia editoriale, dettaglio prodotto e food styling.", gallery: ["assets/gallery/08-editorial-photo.jpg"] },
+  { cover: "assets/gallery/09-behind-scenes.jpg",    tag: "Foto",  title: "Backstage",        desc: "Il dietro le quinte di set, produzioni e progetti in corso.", gallery: ["assets/gallery/09-behind-scenes.jpg"] },
 ];
 
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ---------------- Carosello ---------------- */
+/* ---------------- Lightbox / gallery del servizio ---------------- */
+const openService = (function initLightbox() {
+  const box = document.querySelector("#lightbox");
+  if (!box) return function () {};
+  const img = box.querySelector("#lbImage");
+  const tagEl = box.querySelector("#lbTag");
+  const titleEl = box.querySelector("#lbTitle");
+  const descEl = box.querySelector("#lbDesc");
+  const countEl = box.querySelector("#lbCount");
+  const prevBtn = box.querySelector(".lightbox-nav.prev");
+  const nextBtn = box.querySelector(".lightbox-nav.next");
+
+  let serviceIndex = 0;
+  let photoIndex = 0;
+  let lastFocus = null;
+
+  function currentGallery() {
+    const s = services[serviceIndex];
+    return s.gallery && s.gallery.length ? s.gallery : [s.cover];
+  }
+
+  function render() {
+    const s = services[serviceIndex];
+    const gal = currentGallery();
+    photoIndex = ((photoIndex % gal.length) + gal.length) % gal.length;
+    img.src = gal[photoIndex];
+    img.alt = `${s.title} — foto ${photoIndex + 1}`;
+    tagEl.textContent = s.tag;
+    titleEl.textContent = s.title;
+    descEl.textContent = s.desc || "";
+    const multi = gal.length > 1;
+    countEl.textContent = multi ? `${photoIndex + 1} / ${gal.length}` : "";
+    prevBtn.hidden = nextBtn.hidden = !multi;
+  }
+
+  function open(index) {
+    serviceIndex = index;
+    photoIndex = 0;
+    lastFocus = document.activeElement;
+    render();
+    box.hidden = false;
+    document.body.style.overflow = "hidden";
+    if (window.__carousel) window.__carousel.pause();
+    box.querySelector(".lightbox-close").focus();
+  }
+
+  function close() {
+    box.hidden = true;
+    document.body.style.overflow = "";
+    if (window.__carousel) window.__carousel.resume();
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  function move(dir) { photoIndex += dir; render(); }
+
+  box.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
+  prevBtn.addEventListener("click", () => move(-1));
+  nextBtn.addEventListener("click", () => move(1));
+
+  document.addEventListener("keydown", (e) => {
+    if (box.hidden) return;
+    if (e.key === "Escape") close();
+    else if (e.key === "ArrowLeft") move(-1);
+    else if (e.key === "ArrowRight") move(1);
+  });
+
+  return open;
+})();
+
+/* ---------------- Carosello a scorrimento continuo ---------------- */
 (function initCarousel() {
   const track = document.querySelector("#carouselTrack");
-  const dotsWrap = document.querySelector("#carouselDots");
   const root = document.querySelector("#carousel");
+  const viewport = document.querySelector(".carousel-viewport");
   if (!track || !root) return;
 
-  const N = galleryImages.length;
-  const COPIES = 3;                 // buffer a sinistra e a destra
-  let position = N;                 // parte dalla copia centrale
-  let step = 0;                     // larghezza card + gap, in px
-  let autoplayId = null;
-  const INTERVAL = 3600;
+  const N = services.length;
+  const COPIES = 3;            // copie del set per lo scorrimento infinito
+  const AUTO_SPEED = 26;       // px al secondo — lento
+  let pos = 0;                 // pixel scorsi (verso sinistra)
+  let step = 0;                // larghezza card + gap
+  let setWidth = 0;            // larghezza di un set completo (N card)
+  let paused = false;          // pausa su hover
+  let tween = null;            // spostamento manuale con le frecce
+  let lastTs = 0;
 
-  function buildCard(image) {
+  function buildCard(service, index) {
     const card = document.createElement("article");
     card.className = "gallery-card";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Apri la gallery: ${service.title}`);
 
     const img = document.createElement("img");
-    img.src = image.src;
-    img.alt = image.alt;
+    img.src = service.cover;
+    img.alt = service.title;
     img.loading = "lazy";
     img.decoding = "async";
+    img.draggable = false;
     img.addEventListener("error", () => { img.style.display = "none"; });
 
     const caption = document.createElement("div");
     caption.className = "gallery-caption";
     caption.innerHTML =
-      `<span class="tag">${image.tag}</span><span class="title">${image.title}</span>`;
+      `<span class="tag">${service.tag}</span>` +
+      `<span class="title">${service.title}</span>` +
+      `<span class="view">Apri gallery →</span>`;
 
     card.append(img, caption);
+    const open = () => openService(index);
+    card.addEventListener("click", open);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(); }
+    });
     return card;
   }
 
-  // Render 3 copie complete (buffer per lo scorrimento infinito)
+  // Render COPIES set completi (buffer per il loop senza stacchi)
   const frag = document.createDocumentFragment();
   for (let c = 0; c < COPIES; c++) {
-    galleryImages.forEach((image) => frag.appendChild(buildCard(image)));
+    services.forEach((service, i) => frag.appendChild(buildCard(service, i)));
   }
   track.appendChild(frag);
-
-  // Dots (una per immagine)
-  const dots = [];
-  for (let i = 0; i < N; i++) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.setAttribute("role", "tab");
-    b.setAttribute("aria-label", `Vai all'immagine ${i + 1}`);
-    b.addEventListener("click", () => goToImage(i));
-    dotsWrap.appendChild(b);
-    dots.push(b);
-  }
 
   function measure() {
     const gapPx = parseFloat(getComputedStyle(track).columnGap) || 0;
     track.style.setProperty("--gap", gapPx + "px");
     const card = track.children[0];
-    step = card ? card.getBoundingClientRect().width + gapPx : 0;
-    setX(false);
+    const cardW = card ? card.getBoundingClientRect().width : 0;
+    step = cardW + gapPx;
+    setWidth = step * N;
+    if (setWidth > 0) pos = ((pos % setWidth) + setWidth) % setWidth;
+    apply();
   }
 
-  function setX(animate) {
-    track.style.transition = animate && !reduceMotion
-      ? "transform 0.7s cubic-bezier(0.22,0.61,0.36,1)"
-      : "none";
-    track.style.transform = `translate3d(${-position * step}px, 0, 0)`;
+  function apply() {
+    track.style.transform = `translate3d(${-pos}px, 0, 0)`;
   }
 
-  function activeImage() {
-    return ((position % N) + N) % N;
+  function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+  function frame(ts) {
+    const dt = lastTs ? ts - lastTs : 16;
+    lastTs = ts;
+
+    if (tween) {
+      const t = Math.min(1, (ts - tween.start) / tween.dur);
+      pos = tween.from + (tween.to - tween.from) * easeOutCubic(t);
+      if (t >= 1) tween = null;
+    } else if (!paused && !reduceMotion) {
+      pos += AUTO_SPEED * (dt / 1000);
+    }
+
+    if (setWidth > 0) {
+      while (pos >= setWidth) pos -= setWidth;
+      while (pos < 0) pos += setWidth;
+    }
+    apply();
+    requestAnimationFrame(frame);
   }
 
-  function updateDots() {
-    const a = activeImage();
-    dots.forEach((d, i) => d.classList.toggle("active", i === a));
+  function nudge(dir) {
+    const from = tween ? tween.to : pos;
+    tween = { from, to: from + dir * step, start: performance.now(), dur: 620 };
   }
 
-  function normalize() {
-    // Riporta la posizione nella banda centrale senza animazione
-    if (position >= 2 * N) position -= N;
-    else if (position < N) position += N;
-    else return;
-    setX(false);
-  }
-
-  function move(dir) {
-    position += dir;
-    setX(true);
-    updateDots();
-  }
-
-  function goToImage(i) {
-    let delta = i - activeImage();
-    // scegli il percorso più breve sul cerchio delle 9 immagini
-    if (delta > N / 2) delta -= N;
-    if (delta < -N / 2) delta += N;
-    move(delta);
-  }
-
-  // Quando l'animazione finisce, se necessario, ricentra istantaneamente
-  track.addEventListener("transitionend", normalize);
-
-  // Autoplay: le immagini entrano da sinistra ed escono a destra (effetto revolver)
-  function startAutoplay() {
-    if (reduceMotion || autoplayId !== null) return;
-    autoplayId = window.setInterval(() => move(-1), INTERVAL);
-  }
-  function stopAutoplay() {
-    if (autoplayId !== null) { window.clearInterval(autoplayId); autoplayId = null; }
-  }
-
-  // Frecce manuali
-  root.querySelector(".carousel-arrow.next").addEventListener("click", () => { move(1); });
-  root.querySelector(".carousel-arrow.prev").addEventListener("click", () => { move(-1); });
+  root.querySelector(".carousel-arrow.next").addEventListener("click", () => nudge(1));
+  root.querySelector(".carousel-arrow.prev").addEventListener("click", () => nudge(-1));
 
   // Pausa su hover / focus / tab nascosta
-  root.addEventListener("mouseenter", stopAutoplay);
-  root.addEventListener("mouseleave", startAutoplay);
-  root.addEventListener("focusin", stopAutoplay);
-  root.addEventListener("focusout", startAutoplay);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden) stopAutoplay();
-    else startAutoplay();
-  });
+  viewport.addEventListener("mouseenter", () => { paused = true; });
+  viewport.addEventListener("mouseleave", () => { paused = false; });
+  viewport.addEventListener("focusin", () => { paused = true; });
+  viewport.addEventListener("focusout", () => { paused = false; });
+  document.addEventListener("visibilitychange", () => { paused = document.hidden; });
 
-  // Resize (debounced)
   let resizeId;
   window.addEventListener("resize", () => {
     window.clearTimeout(resizeId);
@@ -152,8 +204,13 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
   window.addEventListener("load", measure);
 
   measure();
-  updateDots();
-  startAutoplay();
+  requestAnimationFrame(frame);
+
+  // esposto alla lightbox per mettere in pausa quando è aperta
+  window.__carousel = {
+    pause() { paused = true; },
+    resume() { paused = false; },
+  };
 })();
 
 /* ---------------- Header dinamico ---------------- */
