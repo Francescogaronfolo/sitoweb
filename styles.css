@@ -64,41 +64,29 @@ h1, h2, h3, p { margin-top: 0; }
 }
 .section-sub { margin: 0; color: var(--muted); font-size: clamp(1rem, 1.5vw, 1.12rem); line-height: 1.6; }
 
-/* ---------- Segnalibro area riservata ---------- */
-.bookmark {
+/* ---------- Segnalibro discreto (accesso riservato) ---------- */
+/* Piccolo simbolo appena percettibile in alto a destra: lo riconosci solo tu. */
+.bookmark-dot {
   position: fixed;
   top: 0;
-  right: clamp(20px, 6vw, 90px);
+  right: 14px;
   z-index: 70;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 26px;
+  padding-top: 2px;
+  border-radius: 0 0 5px 5px;
+  color: rgba(169, 161, 150, 0.28);
+  transform: translateY(-9px);
+  transition: transform 0.35s var(--ease), color 0.35s var(--ease);
 }
-.bookmark-tab {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 9px 16px 11px;
-  transform: translateY(-30px);
-  background: var(--panel-2);
-  border: 1px solid var(--line);
-  border-top: none;
-  border-radius: 0 0 10px 10px;
-  color: var(--muted);
-  font-size: 0.66rem;
-  font-weight: 500;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
-  transition: transform 0.4s var(--ease), color 0.3s var(--ease), background 0.3s var(--ease);
-}
-.bookmark-tab svg { color: var(--accent); transition: transform 0.4s var(--ease); }
-.bookmark-tab span { max-width: 0; overflow: hidden; white-space: nowrap; opacity: 0; transition: max-width 0.4s var(--ease), opacity 0.3s var(--ease); }
-.bookmark-tab:hover,
-.bookmark-tab:focus-visible {
+.bookmark-dot:hover,
+.bookmark-dot:focus-visible {
   transform: translateY(0);
-  color: var(--ink);
-  background: var(--panel);
+  color: var(--accent);
+  outline: none;
 }
-.bookmark-tab:hover span,
-.bookmark-tab:focus-visible span { max-width: 160px; opacity: 1; }
 
 /* ---------- Header ---------- */
 .site-header {
