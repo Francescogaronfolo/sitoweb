@@ -1,45 +1,79 @@
-# Sito Portfolio — Videomaker &amp; Photographer
+# Sito Portfolio — Francesco Garonfolo (Videomaker &amp; Photographer)
 
-Sito statico (HTML/CSS/JS puro, senza build) per un videomaker e fotografo.
+Sito statico (HTML/CSS/JS puro, senza build) minimale e "photo-first", con
+area riservata per notifiche richieste e analisi clienti.
 
-## Struttura
+## Pagine
 
-- `index.html` — contenuti: hero, carosello servizi, contatti, social, lightbox.
-- `styles.css` — layout, tema cinematografico elegante, responsive e reduced-motion.
-- `script.js` — carosello a **scorrimento continuo e lento**, pausa su hover, frecce manuali, **lightbox con gallery per servizio**, header dinamico, reveal allo scroll.
-- `assets/hero/studio-hero.png` — immagine del banner (sostituibile con foto o video).
-- `assets/gallery/` — immagini del carosello (placeholder da sostituire).
-- `vercel.json` — configurazione per il deploy su Vercel.
+- `index.html` — home minimale: banner ridotto e **vetrina a scorrimento guidato
+  dal mouse** (mouse a destra = avanti, a sinistra = indietro, fluido, senza click).
+  Ogni foto è la **copertina di una categoria**.
+- `category.html?cat=SLUG` — **pagina immersiva** del servizio: hero, galleria
+  "collana" asimmetrica (lightbox), descrizione operativa e **contatti** (email +
+  telefono, nessun prezzo) con pulsante **Richiedi preventivo**.
+- `admin.html` — **area riservata** (accesso dal segnalibro in alto): notifiche
+  richieste, clienti, categorie e analisi.
 
-## Come funziona il carosello
+## File
 
-- Le foto scorrono **in modo continuo e lento**, senza scatti.
-- Lo scorrimento **si ferma quando passi sopra con il mouse** (o con il focus da tastiera).
-- **Clic su una foto** → si apre la **lightbox** che ingrandisce l'immagine e mostra la gallery di quel servizio.
-- Le **frecce ai lati** del carosello fanno scorrere manualmente.
-- Nella lightbox: frecce/←→ per sfogliare le foto del servizio, `Esc` o clic fuori per chiudere.
+```text
+sitoweb/
+  index.html            home pubblica
+  category.html         pagina categoria immersiva
+  admin.html            area riservata
+  styles.css            stile base condiviso
+  category.css          stile pagina categoria + lightbox
+  admin.css             stile area riservata
+  js/data.js            dati servizi + data layer (Firebase opzionale + localStorage)
+  js/site.js            vetrina a mouse + modale preventivo
+  js/category.js        rendering pagina categoria + lightbox
+  js/admin.js           login, inbox, clienti, categorie, analisi
+  assets/gallery/       immagini delle categorie (placeholder da sostituire)
+```
 
-## Cosa personalizzare
+## Personalizzare i servizi
 
-1. **Servizi e gallery** — in `script.js`, l'array `services` definisce ogni foto del carosello:
-   - `cover` — immagine mostrata nel carosello,
-   - `tag`, `title`, `desc` — etichetta, titolo e descrizione,
-   - `gallery` — **elenco delle foto del servizio** mostrate nella lightbox.
-   Per collegare più foto a un servizio (es. tutte le foto di ristorazione), aggiungi i percorsi in `gallery`:
-   ```js
-   { cover: "assets/gallery/ristorazione/01.jpg", tag: "Foto", title: "Ristorazione",
-     desc: "Food photography per menu, social e delivery.",
-     gallery: [
-       "assets/gallery/ristorazione/01.jpg",
-       "assets/gallery/ristorazione/02.jpg",
-       "assets/gallery/ristorazione/03.jpg"
-     ] }
-   ```
-   Con più di una foto compaiono automaticamente le frecce e il contatore nella lightbox.
-2. **Banner** — sostituisci `assets/hero/studio-hero.png`. Per usare un **video** al posto della foto, in `index.html` c'è già il markup pronto da scommentare (`<video autoplay muted loop playsinline>`).
-3. **Contatti** — in `index.html`, sezione `#contatti`: aggiorna email, telefono e partita IVA.
-4. **Social** — nella `social-dock` in fondo a sinistra, inserisci i link reali di Instagram e TikTok.
-5. **Nome/brand** — aggiorna "Francesco Garonfolo" nell'header, nell'hero e nel footer.
+In `js/data.js`, l'array `SERVICES` definisce ogni categoria:
+
+```js
+{
+  slug: "wedding",              // usato nell'URL: category.html?cat=wedding
+  tag: "Film & Foto",
+  title: "Wedding",
+  cover: "assets/gallery/01-wedding-film.jpg",
+  intro: "Frase di presentazione…",
+  operativo: "Descrizione di come lavori…",
+  gallery: ["assets/gallery/…", "assets/gallery/…"]  // foto della pagina immersiva
+}
+```
+
+Aggiungi/rimuovi voci o sostituisci le immagini in `assets/gallery/`.
+Aggiorna email/telefono in `index.html`, `js/category.js` (blocco contatti) e
+`admin.html`.
+
+## Area riservata
+
+Accesso dal **segnalibro** in alto (icona a forma di bookmark) → `admin.html`.
+
+- **Richieste**: le richieste inviate dal form "Richiedi preventivo" arrivano qui
+  come notifiche (badge). Da una richiesta puoi creare un cliente con un click.
+- **Clienti**: anagrafica con categoria, note e **storico preventivi** (data,
+  descrizione, importo) inseriti/modificati manualmente.
+- **Categorie**: crea categorie colorate per segmentare i clienti.
+- **Analisi**: barra di ricerca (nome cliente, oppure `*categoria` per filtrare
+  per categoria), grafici a torta (carico di lavoro e fatturato per categoria) e
+  classifiche per **media a preventivo** e **fatturato annuo**, sia per categoria
+  sia per singolo cliente. Selettore anno in alto a destra.
+
+### Accesso e sincronizzazione
+
+- **Firebase** (Firestore + Auth): opzionale, riusa lo stesso progetto di
+  MasterJobs con collection dedicate (`fgQuoteRequests`, `fgStudio/*`) — non tocca
+  i dati di MasterJobs. Con l'accesso email/password le richieste si sincronizzano
+  tra dispositivi (come le notifiche di MasterJobs).
+- **Solo locale**: se Firebase non è configurato/raggiungibile, tutto funziona con
+  `localStorage` sul dispositivo (pulsante "Entra in locale"). Vedi
+  `FIREBASE_RULES.md` per abilitare la sincronizzazione online.
 
 ## Pubblicazione
 

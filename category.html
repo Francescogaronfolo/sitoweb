@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c0d0c" />
+    <meta name="description" content="Servizio fotografico e video — Francesco Garonfolo." />
+    <title>Servizio | Francesco Garonfolo</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="category.css" />
+  </head>
+  <body id="top">
+    <div class="bookmark">
+      <a class="bookmark-tab" href="admin.html" aria-label="Area riservata">
+        <svg viewBox="0 0 24 24" width="15" height="15" aria-hidden="true">
+          <path d="M6 3h12v18l-6-4-6 4V3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+        </svg>
+        <span>Area riservata</span>
+      </a>
+    </div>
+
+    <header class="site-header" aria-label="Intestazione">
+      <a class="brand" href="index.html">Francesco&nbsp;Garonfolo</a>
+      <nav class="main-nav" aria-label="Navigazione principale">
+        <a href="index.html#portfolio">Servizi</a>
+        <a href="index.html#contatti">Contatti</a>
+      </nav>
+    </header>
+
+    <main id="catRoot">
+      <!-- riempito da js/category.js -->
+    </main>
+
+    <!-- Modale preventivo (condivisa) -->
+    <div class="modal" id="quoteModal" role="dialog" aria-modal="true" aria-labelledby="quoteTitle" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card">
+        <button class="modal-close" type="button" aria-label="Chiudi" data-close>
+          <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+        <p class="eyebrow">Richiesta preventivo</p>
+        <h2 id="quoteTitle">Parlami del tuo progetto</h2>
+        <form class="quote-form" id="quoteForm" novalidate>
+          <label>Nome e cognome<input required name="name" type="text" autocomplete="name" /></label>
+          <div class="form-row">
+            <label>Email<input required name="email" type="email" autocomplete="email" /></label>
+            <label>Telefono<input name="phone" type="tel" autocomplete="tel" /></label>
+          </div>
+          <label>Servizio<select name="service" id="quoteService"></select></label>
+          <label>Messaggio<textarea name="message" rows="4" placeholder="Data, luogo, idea del progetto…"></textarea></label>
+          <button class="btn btn-primary" type="submit">Invia richiesta</button>
+          <p class="form-note" id="quoteFeedback" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+    <!-- Lightbox foto -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" hidden>
+      <div class="lightbox-backdrop" data-close></div>
+      <button class="lightbox-close" type="button" aria-label="Chiudi" data-close>
+        <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+      <button class="lightbox-nav prev" type="button" aria-label="Precedente"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <figure class="lightbox-stage"><img id="lbImage" src="" alt="" /></figure>
+      <button class="lightbox-nav next" type="button" aria-label="Successiva"><svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/site.js"></script>
+    <script src="js/category.js"></script>
+  </body>
+</html>

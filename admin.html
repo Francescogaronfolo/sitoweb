@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0c0d0c" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Area riservata | Francesco Garonfolo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="admin.css" />
+  </head>
+  <body>
+    <header class="site-header scrolled" aria-label="Intestazione">
+      <a class="brand" href="index.html">Francesco&nbsp;Garonfolo</a>
+      <nav class="main-nav">
+        <a href="index.html">Sito</a>
+        <a href="#" id="logoutLink" hidden>Esci</a>
+      </nav>
+    </header>
+
+    <!-- ===== Login ===== -->
+    <main class="admin-wrap" id="loginView">
+      <section class="login-card">
+        <p class="eyebrow">Area riservata</p>
+        <h1>Accesso amministratore</h1>
+        <form id="loginForm" class="quote-form">
+          <label>Email<input required type="email" id="admEmail" autocomplete="username" /></label>
+          <label>Password<input required type="password" id="admPass" autocomplete="current-password" /></label>
+          <button class="btn btn-primary" type="submit">Entra</button>
+          <p class="form-note" id="loginFeedback" aria-live="polite"></p>
+        </form>
+        <button class="linklike" id="localMode" type="button">Entra in locale (solo questo dispositivo)</button>
+      </section>
+    </main>
+
+    <!-- ===== Console ===== -->
+    <main class="admin-console" id="consoleView" hidden>
+      <nav class="admin-tabs" aria-label="Sezioni">
+        <button class="tab active" data-tab="inbox">
+          Richieste <span class="badge" id="inboxBadge">0</span>
+        </button>
+        <button class="tab" data-tab="clients">Clienti</button>
+        <button class="tab" data-tab="categories">Categorie</button>
+        <button class="tab" data-tab="analytics">Analisi</button>
+        <span class="sync-state" id="syncState"></span>
+      </nav>
+
+      <!-- Inbox / notifiche -->
+      <section class="panel tab-panel active" id="tab-inbox">
+        <div class="panel-head">
+          <div><p class="eyebrow">Notifiche</p><h2>Richieste di preventivo</h2></div>
+          <button class="btn btn-ghost" id="refreshInbox" type="button">Aggiorna</button>
+        </div>
+        <div class="inbox-layout">
+          <div class="inbox-list" id="inboxList"></div>
+          <article class="inbox-detail" id="inboxDetail">Seleziona una richiesta.</article>
+        </div>
+      </section>
+
+      <!-- Clienti -->
+      <section class="panel tab-panel" id="tab-clients" hidden>
+        <div class="panel-head">
+          <div><p class="eyebrow">Anagrafica</p><h2>Clienti</h2></div>
+          <button class="btn btn-primary" id="newClient" type="button">+ Nuovo cliente</button>
+        </div>
+        <div class="client-layout">
+          <div class="client-list" id="clientList"></div>
+          <article class="client-detail" id="clientDetail">Seleziona o crea un cliente.</article>
+        </div>
+      </section>
+
+      <!-- Categorie -->
+      <section class="panel tab-panel" id="tab-categories" hidden>
+        <div class="panel-head"><div><p class="eyebrow">Segmentazione</p><h2>Categorie clienti</h2></div></div>
+        <form class="cat-form" id="catForm">
+          <input type="text" id="catName" placeholder="Nome categoria (es. Wedding, Aziende, Privati)" />
+          <input type="color" id="catColor" value="#c9a86a" aria-label="Colore" />
+          <button class="btn btn-primary" type="submit">Aggiungi</button>
+        </form>
+        <div class="cat-chips" id="catChips"></div>
+      </section>
+
+      <!-- Analisi -->
+      <section class="panel tab-panel" id="tab-analytics" hidden>
+        <div class="panel-head">
+          <div><p class="eyebrow">Business intelligence</p><h2>Analisi preventivi</h2></div>
+          <select id="yearSelect" class="year-select" aria-label="Anno"></select>
+        </div>
+
+        <div class="search-wrap">
+          <input type="text" id="searchBox" list="searchHints" placeholder="Cerca un cliente per nome, oppure *categoria" />
+          <datalist id="searchHints"></datalist>
+        </div>
+
+        <div class="kpi-row" id="kpiRow"></div>
+
+        <div class="charts-row">
+          <div class="chart-card">
+            <h3>Carico di lavoro per categoria</h3>
+            <p class="chart-sub">Numero di preventivi</p>
+            <canvas id="chartWork" width="360" height="360"></canvas>
+            <div class="legend" id="legendWork"></div>
+          </div>
+          <div class="chart-card">
+            <h3>Fatturato per categoria</h3>
+            <p class="chart-sub">Anno selezionato</p>
+            <canvas id="chartRevenue" width="360" height="360"></canvas>
+            <div class="legend" id="legendRevenue"></div>
+          </div>
+        </div>
+
+        <div class="rank-row">
+          <div class="rank-card"><h3>Categorie — media per preventivo</h3><div id="rankCatAvg"></div></div>
+          <div class="rank-card"><h3>Categorie — fatturato annuo</h3><div id="rankCatYear"></div></div>
+          <div class="rank-card"><h3>Clienti — media per preventivo</h3><div id="rankCliAvg"></div></div>
+          <div class="rank-card"><h3>Clienti — fatturato annuo</h3><div id="rankCliYear"></div></div>
+        </div>
+
+        <div class="result-list" id="searchResults"></div>
+      </section>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/admin.js"></script>
+  </body>
+</html>
