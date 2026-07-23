@@ -24,8 +24,8 @@
   inset: 0;
   z-index: -1;
   background:
-    linear-gradient(0deg, rgba(10, 11, 10, 0.94) 0%, rgba(10, 11, 10, 0.2) 55%, rgba(10, 11, 10, 0.4) 100%),
-    linear-gradient(90deg, rgba(10, 11, 10, 0.7), transparent 60%);
+    linear-gradient(0deg, rgba(10, 11, 10, 0.9) 0%, rgba(10, 11, 10, 0.12) 48%, rgba(10, 11, 10, 0.28) 100%),
+    linear-gradient(90deg, rgba(10, 11, 10, 0.55), transparent 55%);
 }
 .cat-back {
   position: absolute;
@@ -40,19 +40,21 @@
 .cat-back:hover { color: var(--ink); }
 .cat-hero-inner { max-width: 760px; }
 .cat-hero-inner h1 {
-  margin: 6px 0 20px;
-  font-family: var(--serif);
+  margin: 8px 0 18px;
+  font-family: var(--sans);
   font-weight: 300;
-  font-size: clamp(2.8rem, 9vw, 6.5rem);
-  line-height: 0.98;
-  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 .cat-intro {
   margin: 0;
-  max-width: 620px;
-  color: rgba(244, 239, 230, 0.86);
-  font-size: clamp(1.05rem, 1.8vw, 1.35rem);
-  line-height: 1.6;
+  max-width: 560px;
+  color: rgba(244, 239, 230, 0.82);
+  font-weight: 300;
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  line-height: 1.65;
 }
 
 /* --- Galleria "collana": griglia asimmetrica --- */
