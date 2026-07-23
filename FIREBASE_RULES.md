@@ -1,45 +1,75 @@
-# Firebase — sincronizzazione opzionale
+# Firebase — configurazione (progetto dedicato `sitoweb-2bc26`)
 
-Il sito funziona **senza Firebase** (dati in `localStorage`). Firebase serve solo
-per far arrivare le richieste di preventivo come **notifiche su più dispositivi**
-e per sincronizzare clienti/categorie tra i dispositivi dell'admin.
+Il sito funziona **anche senza Firebase** (dati in `localStorage`). Firebase serve
+per far arrivare le richieste di preventivo come **notifiche su più dispositivi** e
+per sincronizzare clienti/categorie/analisi tra i dispositivi dell'admin.
 
-Si riusa lo stesso progetto di **MasterJobs** (`js/data.js`), ma con collection
-dedicate, così i dati dei due siti restano separati:
+La configurazione è già inserita in `js/data.js` (progetto `sitoweb-2bc26`).
+
+## Collezioni usate
 
 - `fgQuoteRequests` — richieste inviate dal form pubblico (create senza login)
 - `fgStudio/clients` — anagrafica clienti (solo admin)
 - `fgStudio/categories` — categorie clienti (solo admin)
 
-## Regole Firestore da aggiungere
+## Regole Firestore (modalità produzione)
 
-Aggiungi questi blocchi alle regole esistenti del progetto (prima del blocco
-finale `match /{document=**}`):
+In **Firestore Database → Regole (Rules)**, incolla TUTTO questo e premi
+**Pubblica**:
 
 ```js
-// --- Sito Francesco Garonfolo ---
-match /fgQuoteRequests/{document} {
-  allow create: if true;                 // il pubblico può inviare richieste
-  allow read, delete: if request.auth != null;
-  allow update: if false;
-}
+rules_version = '2';
 
-match /fgStudio/{document} {
-  allow read, write: if request.auth != null;  // solo admin loggato
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Richieste dal form pubblico: chiunque può inviarle,
+    // solo l'admin loggato può leggerle/eliminarle.
+    match /fgQuoteRequests/{document} {
+      allow create: if true;
+      allow read, delete: if request.auth != null;
+      allow update: if false;
+    }
+
+    // Clienti, categorie: solo admin loggato.
+    match /fgStudio/{document} {
+      allow read, write: if request.auth != null;
+    }
+
+    // Tutto il resto: negato.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
 }
 ```
 
-## Attivazione
+## Passaggi in Console Firebase
 
-1. In **Authentication** crea l'utente admin (Email/Password): sono le credenziali
-   usate in `admin.html`.
-2. Pubblica le regole qui sopra.
-3. Verifica: invia una richiesta dal form pubblico → deve comparire nella scheda
-   **Richieste** dopo il login admin (pulsante **Aggiorna**).
+1. **Authentication** → *Sign-in method* → abilita **Email/Password**.
+2. **Authentication** → *Users* → *Add user*: crea email + password dell'admin
+   (sono le credenziali del login in `admin.html`).
+3. **Firestore Database** → *Crea database* → **Avvia in modalità di produzione**
+   → scegli una *location* (es. `eur3` Europa) → *Attiva*.
+4. **Firestore Database** → *Regole* → incolla le regole qui sopra → *Pubblica*.
+5. Verifica: invia una richiesta dal form pubblico → dopo il login admin (scheda
+   **Richieste**, pulsante **Aggiorna**) deve comparire.
 
-Senza queste regole (o senza login) l'area riservata resta comunque utilizzabile
-in **modalità locale**: i dati vengono salvati solo sul dispositivo corrente.
+## Nota sull'errore "billing" alla creazione di Firestore
 
-> Nota sicurezza: essendo un sito statico, la "modalità locale" è pensata per
-> l'uso sul dispositivo del titolare. Per un accesso realmente protetto, usa il
-> login Firebase e le regole sopra.
+Se durante la creazione del database compare *"This API method requires billing
+to be enabled"*:
+
+- Firestore ha un **piano gratuito (Spark)** con quote ampie: per un sito come
+  questo **non paghi nulla**.
+- Il messaggio compare spesso perché il progetto non ha ancora un account di
+  fatturazione collegato. Opzioni:
+  1. **Attendi qualche minuto e riprova** (a volte è temporaneo), oppure prova a
+     scegliere una *location* diversa.
+  2. Se persiste, passa al piano **Blaze**: mantiene **le stesse quote gratuite**
+     (paghi solo se superi i limiti gratuiti, cosa improbabile per questo sito) ma
+     richiede una carta. È la via ufficiale consigliata da Google per i progetti
+     nuovi.
+
+Finché Firestore non è attivo, l'area riservata resta utilizzabile in **modalità
+locale** (pulsante "Entra in locale"): i dati restano solo sul dispositivo.

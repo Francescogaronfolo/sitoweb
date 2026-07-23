@@ -229,15 +229,15 @@ const Store = {
 
 /* ---------------- Firebase (opzionale) ---------------- */
 const firebaseConfig = {
-  apiKey: "AIzaSyA76c2X0mPs2ybNZrZM05O1hD_pWLrFx9o",
-  authDomain: "masterjobs-39de1.firebaseapp.com",
-  projectId: "masterjobs-39de1",
-  storageBucket: "masterjobs-39de1.firebasestorage.app",
-  messagingSenderId: "371668424027",
-  appId: "1:371668424027:web:be9df60cfa5a9f42b5f67e"
+  apiKey: "AIzaSyDVnnoqQz11K8kBcpVsBkSQc3H19QXvqoI",
+  authDomain: "sitoweb-2bc26.firebaseapp.com",
+  projectId: "sitoweb-2bc26",
+  storageBucket: "sitoweb-2bc26.firebasestorage.app",
+  messagingSenderId: "245019396411",
+  appId: "1:245019396411:web:099bf93f49a1e1e28d8f1e"
 };
 
-// Collezioni dedicate a questo sito (non toccano i dati di MasterJobs).
+// Progetto Firebase dedicato a questo sito.
 const COL_REQUESTS = "fgQuoteRequests";
 const DOC_CLIENTS = { col: "fgStudio", id: "clients" };
 const DOC_CATEGORIES = { col: "fgStudio", id: "categories" };
