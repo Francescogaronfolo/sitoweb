@@ -28,9 +28,8 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
   const FRICTION = 0.94;   // attrito del momentum (più basso = frena prima)
   const MAX_FLING = 3200;  // limite velocità del flick
 
-  // Su dispositivi touch niente deriva automatica: resta stabile finché non trascini.
-  const isTouch = window.matchMedia("(hover: none)").matches;
-  const idleSpeed = isTouch ? 0 : IDLE_SPEED;
+  // Deriva automatica continua (anche su mobile); il trascinamento resta fluido.
+  const idleSpeed = IDLE_SPEED;
 
   let pos = 0;
   let setWidth = 0;

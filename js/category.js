@@ -100,8 +100,7 @@
     const DEADZONE = 0.12;
     const FRICTION = 0.94;
     const MAX_FLING = 3200;
-    const isTouch = window.matchMedia("(hover: none)").matches;
-    const idleSpeed = isTouch ? 0 : IDLE_SPEED;
+    const idleSpeed = IDLE_SPEED; // deriva continua anche su mobile
 
     let pos = 0, setWidth = 0, velocity = 0, targetVel = 0, hovering = false, lastTs = 0;
     let dragging = false, flinging = false;
