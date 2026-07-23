@@ -270,13 +270,30 @@ function openClient(id) {
     toast("Cliente salvato");
   });
 
-  el("delClient").addEventListener("click", () => {
-    if (!confirm(`Eliminare ${c.name}?`)) return;
+  // Eliminazione con conferma in-pagina (niente popup nativo, sempre affidabile)
+  const delBtn = el("delClient");
+  let delArmed = false;
+  let delTimer = null;
+  delBtn.addEventListener("click", () => {
+    if (!delArmed) {
+      delArmed = true;
+      delBtn.textContent = "Clicca ancora per confermare";
+      delBtn.classList.add("danger");
+      clearTimeout(delTimer);
+      delTimer = setTimeout(() => {
+        delArmed = false;
+        delBtn.textContent = "Elimina cliente";
+        delBtn.classList.remove("danger");
+      }, 4000);
+      return;
+    }
+    clearTimeout(delTimer);
     store.data.clients = store.data.clients.filter((x) => x.id !== c.id);
     selectedClientId = null;
     store.save(); A.pushClients();
     renderClients();
     el("clientDetail").innerHTML = "Seleziona o crea un cliente.";
+    toast("Cliente eliminato");
   });
 
   el("quoteAdd").addEventListener("submit", (e) => {
@@ -353,11 +370,18 @@ function renderCategories() {
   );
   wrap.querySelectorAll(".cc-del").forEach((b) =>
     b.addEventListener("click", () => {
-      if (!confirm("Eliminare la categoria? I clienti resteranno senza categoria.")) return;
+      if (b.dataset.armed !== "1") {
+        b.dataset.armed = "1";
+        b.textContent = "conferma?";
+        b.classList.add("danger");
+        setTimeout(() => { b.dataset.armed = "0"; b.textContent = "✕"; b.classList.remove("danger"); }, 4000);
+        return;
+      }
       store.data.clients.forEach((c) => { if (c.categoryId === b.dataset.del) c.categoryId = ""; });
       store.data.categories = store.data.categories.filter((x) => x.id !== b.dataset.del);
       store.save(); A.pushCategories(); A.pushClients();
       renderCategories();
+      toast("Categoria eliminata");
     })
   );
 }
