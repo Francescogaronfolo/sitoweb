@@ -3,7 +3,8 @@
 /* =========================================================
    PAGINA CATEGORIA
    - Intestazione compatta (testo in alto).
-   - "Collana" di foto che scorre col mouse (come la home, ~1/4).
+   - "Revolver": collana di foto che scorre col mouse/dito.
+   - Sotto: distribuzione asimmetrica di foto/video "in evidenza".
    - Clic su una foto -> ingrandimento con piccola descrizione.
    ========================================================= */
 (function initCategory() {
@@ -30,6 +31,36 @@
   const esc = FGc.escapeHtml;
   const strip = FGc.getStrip(service);
 
+  // Distribuzione "in evidenza": foto e/o video.
+  // In js/data.js, "gallery" può contenere:
+  //   "path.jpg"                              -> foto
+  //   { src:"path.jpg", caption:"..." }       -> foto con descrizione
+  //   { video:"clip.mp4", poster:"p.jpg" }    -> video (autoplay muto in loop)
+  const featured = (service.gallery || []).map((it) => {
+    if (typeof it === "string") return { type: "image", src: it, caption: "" };
+    if (it && it.video) return { type: "video", src: it.video, poster: it.poster || "", caption: it.caption || "" };
+    if (it && it.src) return { type: "image", src: it.src, caption: it.caption || "" };
+    return null;
+  }).filter(Boolean);
+  const featuredImages = featured.filter((f) => f.type === "image").map((f) => ({ src: f.src, caption: f.caption }));
+
+  const shots = featured.map((it, i) => {
+    const kind = i % 3 === 0 ? "wide" : i % 3 === 1 ? "tall" : "std";
+    if (it.type === "video") {
+      return `<figure class="shot ${kind} shot-video">
+        <video src="${esc(it.src)}" ${it.poster ? `poster="${esc(it.poster)}"` : ""} autoplay muted loop playsinline></video>
+      </figure>`;
+    }
+    const imgIdx = featuredImages.findIndex((x) => x.src === it.src);
+    return `<figure class="shot ${kind}" data-img="${imgIdx}" tabindex="0" role="button" aria-label="Open photo ${i + 1}">
+      <img src="${esc(it.src)}" alt="${esc(it.caption || service.title)}" loading="lazy" decoding="async" />
+    </figure>`;
+  }).join("");
+
+  const galleryBlock = featured.length
+    ? `<section class="cat-gallery" aria-label="${esc(service.title)} — featured">${shots}</section>`
+    : "";
+
   root.innerHTML = `
     <section class="cat-head" style="--cover:url('${esc(service.cover)}')">
       <div class="cat-head-scrim"></div>
@@ -48,6 +79,8 @@
       <div class="strip-edge prev" id="stripPrev" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="strip-edge next" id="stripNext" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </section>
+
+    ${galleryBlock}
 
     <section class="cat-body">
       <div class="cat-operativo reveal">
@@ -87,7 +120,7 @@
     : null;
   root.querySelectorAll(".reveal").forEach((el) => (io ? io.observe(el) : el.classList.add("is-visible")));
 
-  /* ---------------- Collana a scorrimento col mouse ---------------- */
+  /* ---------------- Revolver a scorrimento (mouse + touch fluido) ---------------- */
   (function initStrip() {
     const track = root.querySelector("#stripTrack");
     const viewport = root.querySelector("#stripViewport");
@@ -100,7 +133,7 @@
     const DEADZONE = 0.12;
     const FRICTION = 0.94;
     const MAX_FLING = 3200;
-    const idleSpeed = IDLE_SPEED; // deriva continua anche su mobile
+    const idleSpeed = IDLE_SPEED;
 
     let pos = 0, setWidth = 0, velocity = 0, targetVel = 0, hovering = false, lastTs = 0;
     let dragging = false, flinging = false;
@@ -118,7 +151,7 @@
       img.draggable = false;
       img.addEventListener("error", () => { img.style.display = "none"; });
       tile.appendChild(img);
-      tile.addEventListener("click", () => openLightbox(index));
+      tile.addEventListener("click", () => { if (!moved) openLightbox(strip, index); });
       return tile;
     }
 
@@ -135,6 +168,7 @@
       apply();
     }
     function apply() { track.style.transform = `translate3d(${-pos}px,0,0)`; }
+    function wrap() { if (setWidth > 0) { while (pos >= setWidth * 2) pos -= setWidth; while (pos < setWidth) pos += setWidth; } }
 
     function setTarget(clientX) {
       const r = viewport.getBoundingClientRect();
@@ -147,10 +181,6 @@
       }
       edgePrev?.classList.toggle("active", targetVel < -1);
       edgeNext?.classList.toggle("active", targetVel > 1);
-    }
-
-    function wrap() {
-      if (setWidth > 0) { while (pos >= setWidth * 2) pos -= setWidth; while (pos < setWidth) pos += setWidth; }
     }
 
     function frame(ts) {
@@ -176,10 +206,10 @@
     viewport.addEventListener("mousemove", (e) => { hovering = true; flinging = false; setTarget(e.clientX); });
     viewport.addEventListener("mouseleave", () => { hovering = false; targetVel = 0; edgePrev?.classList.remove("active"); edgeNext?.classList.remove("active"); });
 
-    // Touch con momentum e blocco dell'asse
-    let axis = null, startX = 0, startY = 0, lastX = 0, lastMoveT = 0;
+    // Touch: momentum + blocco asse; "moved" evita l'apertura lightbox dopo uno swipe
+    let axis = null, startX = 0, startY = 0, lastX = 0, lastMoveT = 0, moved = false;
     viewport.addEventListener("touchstart", (e) => {
-      dragging = true; flinging = false; hovering = false; axis = null;
+      dragging = true; flinging = false; hovering = false; axis = null; moved = false;
       const t = e.touches[0];
       startX = lastX = t.clientX; startY = t.clientY; lastMoveT = performance.now(); velocity = 0;
     }, { passive: true });
@@ -192,6 +222,7 @@
         else return;
       }
       if (axis === "v") { dragging = false; return; }
+      moved = true;
       e.preventDefault();
       const now = performance.now();
       const move = t.clientX - lastX;
@@ -217,22 +248,31 @@
     requestAnimationFrame(frame);
   })();
 
+  /* ---------------- Distribuzione "in evidenza" -> lightbox ---------------- */
+  root.querySelectorAll(".cat-gallery .shot[data-img]").forEach((fig) => {
+    const i = Number(fig.dataset.img);
+    if (i < 0) return;
+    fig.addEventListener("click", () => openLightbox(featuredImages, i));
+    fig.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(featuredImages, i); } });
+  });
+
   /* ---------------- Lightbox con descrizione ---------------- */
   const box = document.querySelector("#lightbox");
   const img = box.querySelector("#lbImage");
   const capEl = box.querySelector("#lbCap");
   const countEl = box.querySelector("#lbCount");
+  let lbList = strip;
   let idx = 0;
 
   function render() {
-    idx = ((idx % strip.length) + strip.length) % strip.length;
-    const item = strip[idx];
+    idx = ((idx % lbList.length) + lbList.length) % lbList.length;
+    const item = lbList[idx];
     img.src = item.src;
     img.alt = item.caption || `${service.title} — ${idx + 1}`;
     if (capEl) capEl.textContent = item.caption || "";
-    if (countEl) countEl.textContent = `${idx + 1} / ${strip.length}`;
+    if (countEl) countEl.textContent = `${idx + 1} / ${lbList.length}`;
   }
-  function openLightbox(i) { idx = i; render(); box.hidden = false; document.body.style.overflow = "hidden"; box.querySelector(".lightbox-close").focus(); }
+  function openLightbox(list, i) { lbList = list && list.length ? list : strip; idx = i; render(); box.hidden = false; document.body.style.overflow = "hidden"; box.querySelector(".lightbox-close").focus(); }
   function close() { box.hidden = true; document.body.style.overflow = ""; }
   function move(d) { idx += d; render(); }
 
@@ -245,4 +285,7 @@
     else if (e.key === "ArrowLeft") move(-1);
     else if (e.key === "ArrowRight") move(1);
   });
+
+  // esposto ai tile del revolver
+  window.__catLightbox = openLightbox;
 })();
