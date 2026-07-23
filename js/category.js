@@ -1,13 +1,17 @@
 "use strict";
 
 /* =========================================================
-   PAGINA CATEGORIA — layout immersivo del servizio
+   PAGINA CATEGORIA
+   - Intestazione compatta (testo in alto).
+   - "Collana" di foto che scorre col mouse (come la home, ~1/4).
+   - Clic su una foto -> ingrandimento con piccola descrizione.
    ========================================================= */
 (function initCategory() {
   const FGc = window.FG;
   const root = document.querySelector("#catRoot");
   if (!root) return;
 
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const params = new URLSearchParams(location.search);
   const slug = params.get("cat");
   const service = FGc.getService(slug);
@@ -24,32 +28,25 @@
 
   document.title = `${service.title} | Mishari`;
   const esc = FGc.escapeHtml;
-  const gallery = service.gallery && service.gallery.length ? service.gallery : [service.cover];
-
-  // Layout "collana" immersivo: le foto si alternano fra pieni e ritmi diversi.
-  const shots = gallery
-    .map((src, i) => {
-      const kind = i % 3 === 0 ? "wide" : i % 3 === 1 ? "tall" : "std";
-      return `
-        <figure class="shot ${kind}" data-idx="${i}" tabindex="0" role="button" aria-label="Ingrandisci foto ${i + 1}">
-          <img src="${esc(src)}" alt="${esc(service.title)} — foto ${i + 1}" loading="lazy" decoding="async" />
-        </figure>`;
-    })
-    .join("");
+  const strip = FGc.getStrip(service);
 
   root.innerHTML = `
-    <section class="cat-hero" style="--cover:url('${esc(service.cover)}')">
-      <div class="cat-hero-scrim"></div>
+    <section class="cat-head" style="--cover:url('${esc(service.cover)}')">
+      <div class="cat-head-scrim"></div>
       <a class="cat-back" href="index.html#portfolio">← All services</a>
-      <div class="cat-hero-inner">
+      <div class="cat-head-inner">
         <p class="eyebrow">${esc(service.tag)}</p>
         <h1>${esc(service.title)}</h1>
         <p class="cat-intro">${esc(service.intro)}</p>
       </div>
     </section>
 
-    <section class="cat-gallery" aria-label="Galleria ${esc(service.title)}">
-      ${shots}
+    <section class="cat-strip" aria-label="${esc(service.title)} gallery">
+      <div class="strip-viewport" id="stripViewport">
+        <div class="strip-track" id="stripTrack"></div>
+      </div>
+      <div class="strip-edge prev" id="stripPrev" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="strip-edge next" id="stripNext" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </section>
 
     <section class="cat-body">
@@ -76,14 +73,13 @@
   const y = root.querySelector("#year");
   if (y) y.textContent = String(new Date().getFullYear());
 
-  // Collega il pulsante preventivo (site.js espone FGopenQuote)
   root.querySelectorAll(".quote-open").forEach((btn) =>
     btn.addEventListener("click", () => {
       if (window.FGopenQuote) window.FGopenQuote(btn.dataset.service);
     })
   );
 
-  // Reveal per gli elementi aggiunti dopo il caricamento
+  // Reveal
   const io = "IntersectionObserver" in window
     ? new IntersectionObserver((entries) => {
         entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-visible"); io.unobserve(e.target); } });
@@ -91,25 +87,117 @@
     : null;
   root.querySelectorAll(".reveal").forEach((el) => (io ? io.observe(el) : el.classList.add("is-visible")));
 
-  /* ---------------- Lightbox foto ---------------- */
+  /* ---------------- Collana a scorrimento col mouse ---------------- */
+  (function initStrip() {
+    const track = root.querySelector("#stripTrack");
+    const viewport = root.querySelector("#stripViewport");
+    const edgePrev = root.querySelector("#stripPrev");
+    const edgeNext = root.querySelector("#stripNext");
+    const N = strip.length;
+    const COPIES = 3;
+    const MAX_SPEED = 640;
+    const IDLE_SPEED = 16;
+    const DEADZONE = 0.12;
+
+    let pos = 0, setWidth = 0, velocity = 0, targetVel = 0, hovering = false, lastTs = 0;
+
+    function buildTile(item, index) {
+      const tile = document.createElement("button");
+      tile.className = "strip-tile";
+      tile.type = "button";
+      tile.setAttribute("aria-label", `Open photo ${index + 1}`);
+      const img = document.createElement("img");
+      img.src = item.src;
+      img.alt = item.caption || `${service.title} — ${index + 1}`;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.draggable = false;
+      img.addEventListener("error", () => { img.style.display = "none"; });
+      tile.appendChild(img);
+      tile.addEventListener("click", () => openLightbox(index));
+      return tile;
+    }
+
+    const frag = document.createDocumentFragment();
+    for (let c = 0; c < COPIES; c++) strip.forEach((it, i) => frag.appendChild(buildTile(it, i)));
+    track.appendChild(frag);
+
+    function measure() {
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      const tile = track.children[0];
+      const w = tile ? tile.getBoundingClientRect().width : 0;
+      setWidth = (w + gap) * N;
+      if (setWidth > 0) { pos = ((pos % setWidth) + setWidth) % setWidth; if (pos < setWidth) pos += setWidth; }
+      apply();
+    }
+    function apply() { track.style.transform = `translate3d(${-pos}px,0,0)`; }
+
+    function setTarget(clientX) {
+      const r = viewport.getBoundingClientRect();
+      const norm = ((clientX - r.left) / r.width) * 2 - 1;
+      if (Math.abs(norm) < DEADZONE) targetVel = 0;
+      else {
+        const sign = Math.sign(norm);
+        const mag = (Math.abs(norm) - DEADZONE) / (1 - DEADZONE);
+        targetVel = sign * Math.pow(mag, 1.6) * MAX_SPEED;
+      }
+      edgePrev?.classList.toggle("active", targetVel < -1);
+      edgeNext?.classList.toggle("active", targetVel > 1);
+    }
+
+    function frame(ts) {
+      const dt = lastTs ? Math.min(48, ts - lastTs) : 16;
+      lastTs = ts;
+      if (!reduceMotion) {
+        const goal = hovering ? targetVel : IDLE_SPEED;
+        velocity += (goal - velocity) * Math.min(1, dt / 180);
+        pos += velocity * (dt / 1000);
+        if (setWidth > 0) { while (pos >= setWidth * 2) pos -= setWidth; while (pos < setWidth) pos += setWidth; }
+        apply();
+      }
+      requestAnimationFrame(frame);
+    }
+
+    viewport.addEventListener("mouseenter", () => { hovering = true; });
+    viewport.addEventListener("mousemove", (e) => { hovering = true; setTarget(e.clientX); });
+    viewport.addEventListener("mouseleave", () => { hovering = false; targetVel = 0; edgePrev?.classList.remove("active"); edgeNext?.classList.remove("active"); });
+
+    let drag = false, dragX = 0, dragPos = 0;
+    viewport.addEventListener("touchstart", (e) => { drag = true; hovering = false; dragX = e.touches[0].clientX; dragPos = pos; velocity = 0; }, { passive: true });
+    viewport.addEventListener("touchmove", (e) => {
+      if (!drag) return;
+      pos = dragPos - (e.touches[0].clientX - dragX);
+      if (setWidth > 0) { while (pos >= setWidth * 2) pos -= setWidth; while (pos < setWidth) pos += setWidth; }
+      apply();
+    }, { passive: true });
+    viewport.addEventListener("touchend", () => { drag = false; });
+
+    let rid;
+    window.addEventListener("resize", () => { clearTimeout(rid); rid = setTimeout(measure, 150); });
+    window.addEventListener("load", measure);
+    measure();
+    requestAnimationFrame(frame);
+  })();
+
+  /* ---------------- Lightbox con descrizione ---------------- */
   const box = document.querySelector("#lightbox");
   const img = box.querySelector("#lbImage");
+  const capEl = box.querySelector("#lbCap");
+  const countEl = box.querySelector("#lbCount");
   let idx = 0;
 
   function render() {
-    idx = ((idx % gallery.length) + gallery.length) % gallery.length;
-    img.src = gallery[idx];
-    img.alt = `${service.title} — foto ${idx + 1}`;
+    idx = ((idx % strip.length) + strip.length) % strip.length;
+    const item = strip[idx];
+    img.src = item.src;
+    img.alt = item.caption || `${service.title} — ${idx + 1}`;
+    if (capEl) capEl.textContent = item.caption || "";
+    if (countEl) countEl.textContent = `${idx + 1} / ${strip.length}`;
   }
-  function open(i) { idx = i; render(); box.hidden = false; document.body.style.overflow = "hidden"; box.querySelector(".lightbox-close").focus(); }
+  function openLightbox(i) { idx = i; render(); box.hidden = false; document.body.style.overflow = "hidden"; box.querySelector(".lightbox-close").focus(); }
   function close() { box.hidden = true; document.body.style.overflow = ""; }
   function move(d) { idx += d; render(); }
 
-  root.querySelectorAll(".shot").forEach((fig) => {
-    const i = Number(fig.dataset.idx);
-    fig.addEventListener("click", () => open(i));
-    fig.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); open(i); } });
-  });
   box.querySelectorAll("[data-close]").forEach((el) => el.addEventListener("click", close));
   box.querySelector(".lightbox-nav.prev").addEventListener("click", () => move(-1));
   box.querySelector(".lightbox-nav.next").addEventListener("click", () => move(1));

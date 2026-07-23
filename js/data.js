@@ -155,6 +155,21 @@ function getService(slug) {
   return SERVICES.find((s) => s.slug === slug) || null;
 }
 
+/* ---------------- Collana foto (pagina categoria) ----------------
+   10 scatti che scorrono col mouse; clic = ingrandimento + descrizione.
+   Placeholder condivisi: sostituisci src/caption (o definisci "strip"
+   dentro un SERVICE) con le foto reali della categoria. */
+const STRIP_PLACEHOLDER = Array.from({ length: 10 }, (_, i) => ({
+  src: `assets/gallery/strip/${String(i + 1).padStart(2, "0")}.jpg`,
+  caption: `Untitled — ${String(i + 1).padStart(2, "0")}`
+}));
+
+function getStrip(service) {
+  return service && Array.isArray(service.strip) && service.strip.length
+    ? service.strip
+    : STRIP_PLACEHOLDER;
+}
+
 /* ---------------- Utility condivise ---------------- */
 function escapeHtml(value) {
   return String(value ?? "")
@@ -274,6 +289,8 @@ async function initFirebase() {
 const DataLayer = {
   SERVICES,
   getService,
+  getStrip,
+  STRIP_PLACEHOLDER,
   escapeHtml,
   createId,
   formatMoney,
