@@ -8,7 +8,8 @@
   --accent: #c9a86a;
   --line: rgba(244, 239, 230, 0.14);
   --radius: 14px;
-  --serif: "Fraunces", ui-serif, "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  /* Sistema tipografico minimale: un solo font sans, pesi leggeri, ampia spaziatura */
+  --serif: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
@@ -52,6 +53,16 @@ h1, h2, h3, p { margin-top: 0; }
   outline: 2px solid var(--accent);
   outline-offset: 3px;
   border-radius: 4px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .eyebrow {
@@ -107,10 +118,11 @@ h1, h2, h3, p { margin-top: 0; }
   border-bottom: 1px solid var(--line);
 }
 .brand {
-  font-family: var(--serif);
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 400;
-  letter-spacing: 0.015em;
+  font-family: var(--sans);
+  font-size: clamp(0.92rem, 1.6vw, 1.1rem);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
 }
 .main-nav {
   display: flex;
@@ -140,11 +152,11 @@ h1, h2, h3, p { margin-top: 0; }
 }
 .banner-title {
   margin: 0 0 12px;
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-weight: 300;
-  font-size: clamp(2.2rem, 6vw, 4.2rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: 0.01em;
 }
 .banner-sub { margin: 0; color: var(--muted); font-size: clamp(0.95rem, 1.5vw, 1.1rem); }
 
@@ -206,10 +218,12 @@ h1, h2, h3, p { margin-top: 0; }
   margin-bottom: 8px;
 }
 .stage-caption .title {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-weight: 400;
-  font-size: clamp(1.5rem, 2.4vw, 2.4rem);
-  line-height: 1.02;
+  font-size: clamp(1.2rem, 1.9vw, 1.7rem);
+  line-height: 1.1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 .stage-caption .enter {
   display: inline-block;
@@ -259,15 +273,50 @@ h1, h2, h3, p { margin-top: 0; }
   border-top: 1px solid var(--line);
 }
 .contact-head { max-width: 520px; }
-.contact-head h2 {
-  margin: 10px 0 18px;
-  font-family: var(--serif);
+.contact-lead {
+  margin: 0;
+  font-family: var(--sans);
   font-weight: 300;
-  font-size: clamp(2.2rem, 6vw, 4.6rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.8rem, 4.5vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: 0.005em;
+  color: var(--ink);
 }
-.contact-head .quote-open { margin-top: 26px; }
+/* Pulsante contatti: minimale (link sans maiuscolo, spaziato, sottolineatura animata) */
+.btn-soft {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 26px;
+  padding: 4px 0;
+  background: none;
+  border: none;
+  color: var(--ink);
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  position: relative;
+  transition: color 0.3s var(--ease);
+}
+.btn-soft span { transition: transform 0.35s var(--ease); }
+.btn-soft::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.35s var(--ease);
+}
+.btn-soft:hover { color: var(--accent); }
+.btn-soft:hover::after { transform: scaleX(1); }
+.btn-soft:hover span { transform: translateX(4px); }
 .contact-list { display: grid; gap: 4px; font-style: normal; }
 .contact-row {
   display: flex;

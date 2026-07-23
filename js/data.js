@@ -1,7 +1,7 @@
 "use strict";
 
 /* =========================================================
-   DATA LAYER — Francesco Garonfolo
+   DATA LAYER — Mishari
    ---------------------------------------------------------
    - SERVICES: categorie-servizio mostrate in home e nelle
      pagine immersive. Modificabili qui.
@@ -15,13 +15,13 @@
 const SERVICES = [
   {
     slug: "wedding",
-    tag: "Film & Foto",
+    tag: "Film & Photo",
     title: "Wedding",
     cover: "assets/gallery/01-wedding-film.jpg",
     intro:
-      "Racconti di matrimonio con taglio cinematografico: emozione vera, ritmo e una cura sartoriale del dettaglio.",
+      "Wedding stories with a cinematic touch: real emotion, rhythm and a tailored care for every detail.",
     operativo:
-      "Sopralluogo e call preliminare, copertura dell'intera giornata, seconda camera su richiesta, riprese drone dove consentito. Consegna di un film emozionale e di una selezione fotografica editoriale.",
+      "Location scouting and a preliminary call, full-day coverage, a second camera on request, drone footage where allowed. You receive an emotional film and an editorial photo selection.",
     gallery: [
       "assets/gallery/01-wedding-film.jpg",
       "assets/gallery/05-portrait-session.jpg",
@@ -32,12 +32,12 @@ const SERVICES = [
   {
     slug: "videoclip",
     tag: "Video",
-    title: "Videoclip",
+    title: "Music Video",
     cover: "assets/gallery/02-music-video.jpg",
     intro:
-      "Concept visivi per artisti e creator: idea, regia e post-produzione al servizio del brano.",
+      "Visual concepts for artists and creators: idea, direction and post-production at the service of the track.",
     operativo:
-      "Sviluppo del concept, scouting location, riprese dinamiche con ottiche cinema e color grading dedicato. Formati pronti per YouTube e social verticali.",
+      "Concept development, location scouting, dynamic shooting with cinema lenses and dedicated color grading. Formats ready for YouTube and vertical social.",
     gallery: [
       "assets/gallery/02-music-video.jpg",
       "assets/gallery/07-drone-view.jpg",
@@ -50,9 +50,9 @@ const SERVICES = [
     title: "Brand Story",
     cover: "assets/gallery/03-brand-story.jpg",
     intro:
-      "Contenuti per aziende e attivita: identita visiva, prodotto e persone raccontati con eleganza.",
+      "Content for companies and businesses: visual identity, product and people told with elegance.",
     operativo:
-      "Analisi del brand, storyboard, riprese in studio o in sede, montaggio e pacchetto di contenuti social. Focus su coerenza estetica e messaggio.",
+      "Brand analysis, storyboard, shooting in studio or on site, editing and a package of social content. Focus on aesthetic consistency and message.",
     gallery: [
       "assets/gallery/03-brand-story.jpg",
       "assets/gallery/06-commercial.jpg",
@@ -62,12 +62,12 @@ const SERVICES = [
   {
     slug: "eventi",
     tag: "Reportage",
-    title: "Eventi",
+    title: "Events",
     cover: "assets/gallery/04-event-reportage.jpg",
     intro:
-      "Reportage video e fotografico per serate, eventi privati e aziendali. La memoria della giornata, curata.",
+      "Video and photo reportage for parties, private and corporate events. The memory of the day, beautifully kept.",
     operativo:
-      "Copertura discreta e continua, highlight video veloce e selezione fotografica completa. Consegna rapida per la comunicazione post-evento.",
+      "Discreet, continuous coverage, a fast highlight video and a complete photo selection. Quick delivery for post-event communication.",
     gallery: [
       "assets/gallery/04-event-reportage.jpg",
       "assets/gallery/09-behind-scenes.jpg",
@@ -76,13 +76,13 @@ const SERVICES = [
   },
   {
     slug: "ritratti",
-    tag: "Foto",
-    title: "Ritratti",
+    tag: "Photo",
+    title: "Portraits",
     cover: "assets/gallery/05-portrait-session.jpg",
     intro:
-      "Ritratti e shooting editoriali su misura: luce, posa e atmosfera per un'immagine che ti somiglia.",
+      "Tailored portraits and editorial shoots: light, pose and mood for an image that looks like you.",
     operativo:
-      "Mood condiviso prima dello shooting, set in studio o in esterna, selezione e ritocco fine-art. Ideale per personal brand, artisti e professionisti.",
+      "Mood shared before the shoot, set in studio or outdoors, fine-art selection and retouch. Ideal for personal branding, artists and professionals.",
     gallery: [
       "assets/gallery/05-portrait-session.jpg",
       "assets/gallery/08-editorial-photo.jpg",
@@ -95,9 +95,9 @@ const SERVICES = [
     title: "Commercial",
     cover: "assets/gallery/06-commercial.jpg",
     intro:
-      "Spot e contenuti pubblicitari per prodotti, servizi e ristorazione. Estetica pulita, messaggio diretto.",
+      "Ads and commercial content for products, services and food. Clean aesthetics, a direct message.",
     operativo:
-      "Pre-produzione, riprese prodotto/food, montaggio ritmato e versioni multiple per i canali ADV. Attenzione a luce e materia.",
+      "Pre-production, product/food shooting, rhythmic editing and multiple versions for ad channels. Attention to light and texture.",
     gallery: [
       "assets/gallery/06-commercial.jpg",
       "assets/gallery/08-editorial-photo.jpg",
@@ -110,9 +110,9 @@ const SERVICES = [
     title: "Drone & Reel",
     cover: "assets/gallery/07-drone-view.jpg",
     intro:
-      "Riprese aeree e formati verticali pronti per Instagram, TikTok e campagne ADV.",
+      "Aerial footage and vertical formats ready for Instagram, TikTok and ad campaigns.",
     operativo:
-      "Pianificazione voli in aree consentite, riprese aeree stabilizzate, montaggio reel verticale ottimizzato per il feed.",
+      "Flight planning in permitted areas, stabilized aerial footage, vertical reel editing optimized for the feed.",
     gallery: [
       "assets/gallery/07-drone-view.jpg",
       "assets/gallery/04-event-reportage.jpg",
@@ -121,13 +121,13 @@ const SERVICES = [
   },
   {
     slug: "editoriale",
-    tag: "Foto",
-    title: "Editoriale",
+    tag: "Photo",
+    title: "Editorial",
     cover: "assets/gallery/08-editorial-photo.jpg",
     intro:
-      "Fotografia editoriale, dettaglio prodotto e food styling. Composizione e luce curate al millimetro.",
+      "Editorial photography, product detail and food styling. Composition and light cared for to the millimeter.",
     operativo:
-      "Styling, set fotografico controllato, still life e dettaglio, post-produzione cromatica. Per menu, cataloghi e social.",
+      "Styling, controlled photo set, still life and detail, color post-production. For menus, catalogues and social.",
     gallery: [
       "assets/gallery/08-editorial-photo.jpg",
       "assets/gallery/06-commercial.jpg",
@@ -136,13 +136,13 @@ const SERVICES = [
   },
   {
     slug: "backstage",
-    tag: "Foto",
+    tag: "Photo",
     title: "Backstage",
     cover: "assets/gallery/09-behind-scenes.jpg",
     intro:
-      "Il dietro le quinte di set e produzioni: l'energia del lavoro, raccontata senza filtri.",
+      "Behind the scenes of sets and productions: the energy of the work, told without filters.",
     operativo:
-      "Copertura backstage durante le riprese, selezione fotografica e mini-clip per la comunicazione del progetto.",
+      "Backstage coverage during the shoot, a photo selection and mini-clips for the project's communication.",
     gallery: [
       "assets/gallery/09-behind-scenes.jpg",
       "assets/gallery/04-event-reportage.jpg",

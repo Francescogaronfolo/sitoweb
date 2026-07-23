@@ -15,14 +15,14 @@
   if (!service) {
     root.innerHTML = `
       <section class="cat-missing">
-        <p class="eyebrow">Servizio non trovato</p>
-        <h1>Categoria non disponibile</h1>
-        <a class="btn btn-primary" href="index.html#portfolio">Torna ai servizi</a>
+        <p class="eyebrow">Service not found</p>
+        <h1>Category not available</h1>
+        <a class="btn btn-primary" href="index.html#portfolio">Back to services</a>
       </section>`;
     return;
   }
 
-  document.title = `${service.title} | Francesco Garonfolo`;
+  document.title = `${service.title} | Mishari`;
   const esc = FGc.escapeHtml;
   const gallery = service.gallery && service.gallery.length ? service.gallery : [service.cover];
 
@@ -40,7 +40,7 @@
   root.innerHTML = `
     <section class="cat-hero" style="--cover:url('${esc(service.cover)}')">
       <div class="cat-hero-scrim"></div>
-      <a class="cat-back" href="index.html#portfolio">← Tutti i servizi</a>
+      <a class="cat-back" href="index.html#portfolio">← All services</a>
       <div class="cat-hero-inner">
         <p class="eyebrow">${esc(service.tag)}</p>
         <h1>${esc(service.title)}</h1>
@@ -54,23 +54,23 @@
 
     <section class="cat-body">
       <div class="cat-operativo reveal">
-        <p class="eyebrow">Come lavoro</p>
+        <p class="eyebrow">How I work</p>
         <p class="cat-operativo-text">${esc(service.operativo)}</p>
       </div>
       <div class="cat-cta reveal">
-        <h2>Interessato a un progetto ${esc(service.title.toLowerCase())}?</h2>
-        <p class="section-sub">Scrivimi: costruiamo insieme la proposta su misura.</p>
-        <button class="btn btn-primary quote-open" type="button" data-service="${esc(service.slug)}">Richiedi preventivo</button>
+        <h2>Interested in a ${esc(service.title.toLowerCase())} project?</h2>
+        <p class="section-sub">Get in touch — let's shape a tailored proposal together.</p>
+        <button class="btn-soft quote-open" type="button" data-service="${esc(service.slug)}">Let's talk <span aria-hidden="true">→</span></button>
         <div class="cat-contacts">
           <a href="mailto:info@example.com"><span class="contact-label">Email</span><span class="contact-value">info@example.com</span></a>
-          <a href="tel:+390000000000"><span class="contact-label">Telefono</span><span class="contact-value">+39 000 000 0000</span></a>
+          <a href="tel:+390000000000"><span class="contact-label">Phone</span><span class="contact-value">+39 000 000 0000</span></a>
         </div>
       </div>
     </section>
 
     <footer class="site-footer">
-      <span>© <span id="year"></span> Francesco Garonfolo</span>
-      <a href="index.html">Torna alla home</a>
+      <span>© <span id="year"></span> Mishari</span>
+      <a href="index.html">Back to home</a>
     </footer>`;
 
   const y = root.querySelector("#year");

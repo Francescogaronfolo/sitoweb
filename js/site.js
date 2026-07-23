@@ -1,7 +1,7 @@
 "use strict";
 
 /* =========================================================
-   SITO PUBBLICO — Francesco Garonfolo
+   SITO PUBBLICO — Mishari
    - Vetrina a scorrimento guidato dal mouse (stile Squarespace):
      mouse a destra = avanti, a sinistra = indietro, fluido.
    - Clic su una copertina -> pagina immersiva della categoria.
@@ -53,7 +53,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
     cap.innerHTML =
       `<span class="tag">${FGsite.escapeHtml(service.tag)}</span>` +
       `<span class="title">${FGsite.escapeHtml(service.title)}</span>` +
-      `<span class="enter">Entra →</span>`;
+      `<span class="enter">Enter →</span>`;
 
     card.append(img, cap);
     return card;
@@ -168,7 +168,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 
   // popola tendina servizi
   serviceSel.innerHTML =
-    `<option value="">Nessuno / non so ancora</option>` +
+    `<option value="">Not sure yet</option>` +
     FGsite.SERVICES.map((s) => `<option value="${s.slug}">${FGsite.escapeHtml(s.title)}</option>`).join("");
 
   function open(preselect) {
@@ -197,12 +197,12 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
     e.preventDefault();
     const data = Object.fromEntries(new FormData(form).entries());
     if (!data.name?.trim() || !data.email?.trim()) {
-      feedback.textContent = "Inserisci nome ed email.";
+      feedback.textContent = "Please enter your name and email.";
       feedback.className = "form-note error";
       return;
     }
     const svc = FGsite.getService(data.service);
-    feedback.textContent = "Invio in corso…";
+    feedback.textContent = "Sending…";
     feedback.className = "form-note";
     try {
       await FGsite.submitQuoteRequest({
@@ -210,15 +210,15 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
         email: data.email.trim(),
         phone: (data.phone || "").trim(),
         service: data.service || "",
-        serviceLabel: svc ? svc.title : "Generico",
+        serviceLabel: svc ? svc.title : "General",
         message: (data.message || "").trim()
       });
-      feedback.textContent = "Richiesta inviata. Ti risponderò al più presto.";
+      feedback.textContent = "Message sent. I'll get back to you soon.";
       feedback.className = "form-note success";
       form.reset();
       setTimeout(close, 1600);
     } catch {
-      feedback.textContent = "Salvato in locale. Riprova più tardi per l'invio online.";
+      feedback.textContent = "Saved locally. Please try again later.";
       feedback.className = "form-note error";
     }
   });
