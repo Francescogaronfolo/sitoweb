@@ -98,8 +98,13 @@
     const MAX_SPEED = 640;
     const IDLE_SPEED = 16;
     const DEADZONE = 0.12;
+    const FRICTION = 0.94;
+    const MAX_FLING = 3200;
+    const isTouch = window.matchMedia("(hover: none)").matches;
+    const idleSpeed = isTouch ? 0 : IDLE_SPEED;
 
     let pos = 0, setWidth = 0, velocity = 0, targetVel = 0, hovering = false, lastTs = 0;
+    let dragging = false, flinging = false;
 
     function buildTile(item, index) {
       const tile = document.createElement("button");
@@ -145,32 +150,66 @@
       edgeNext?.classList.toggle("active", targetVel > 1);
     }
 
+    function wrap() {
+      if (setWidth > 0) { while (pos >= setWidth * 2) pos -= setWidth; while (pos < setWidth) pos += setWidth; }
+    }
+
     function frame(ts) {
       const dt = lastTs ? Math.min(48, ts - lastTs) : 16;
       lastTs = ts;
-      if (!reduceMotion) {
-        const goal = hovering ? targetVel : IDLE_SPEED;
-        velocity += (goal - velocity) * Math.min(1, dt / 180);
-        pos += velocity * (dt / 1000);
-        if (setWidth > 0) { while (pos >= setWidth * 2) pos -= setWidth; while (pos < setWidth) pos += setWidth; }
+      if (!reduceMotion && !dragging) {
+        if (flinging) {
+          pos += velocity * (dt / 1000);
+          velocity *= Math.pow(FRICTION, dt / 16.67);
+          if (Math.abs(velocity) <= idleSpeed + 2) { flinging = false; velocity = idleSpeed; }
+        } else {
+          const goal = hovering ? targetVel : idleSpeed;
+          velocity += (goal - velocity) * Math.min(1, dt / 180);
+          pos += velocity * (dt / 1000);
+        }
+        wrap();
         apply();
       }
       requestAnimationFrame(frame);
     }
 
     viewport.addEventListener("mouseenter", () => { hovering = true; });
-    viewport.addEventListener("mousemove", (e) => { hovering = true; setTarget(e.clientX); });
+    viewport.addEventListener("mousemove", (e) => { hovering = true; flinging = false; setTarget(e.clientX); });
     viewport.addEventListener("mouseleave", () => { hovering = false; targetVel = 0; edgePrev?.classList.remove("active"); edgeNext?.classList.remove("active"); });
 
-    let drag = false, dragX = 0, dragPos = 0;
-    viewport.addEventListener("touchstart", (e) => { drag = true; hovering = false; dragX = e.touches[0].clientX; dragPos = pos; velocity = 0; }, { passive: true });
-    viewport.addEventListener("touchmove", (e) => {
-      if (!drag) return;
-      pos = dragPos - (e.touches[0].clientX - dragX);
-      if (setWidth > 0) { while (pos >= setWidth * 2) pos -= setWidth; while (pos < setWidth) pos += setWidth; }
-      apply();
+    // Touch con momentum e blocco dell'asse
+    let axis = null, startX = 0, startY = 0, lastX = 0, lastMoveT = 0;
+    viewport.addEventListener("touchstart", (e) => {
+      dragging = true; flinging = false; hovering = false; axis = null;
+      const t = e.touches[0];
+      startX = lastX = t.clientX; startY = t.clientY; lastMoveT = performance.now(); velocity = 0;
     }, { passive: true });
-    viewport.addEventListener("touchend", () => { drag = false; });
+    viewport.addEventListener("touchmove", (e) => {
+      if (!dragging) return;
+      const t = e.touches[0];
+      const dx = t.clientX - startX, dy = t.clientY - startY;
+      if (!axis) {
+        if (Math.abs(dx) > 8 || Math.abs(dy) > 8) axis = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+        else return;
+      }
+      if (axis === "v") { dragging = false; return; }
+      e.preventDefault();
+      const now = performance.now();
+      const move = t.clientX - lastX;
+      pos -= move; wrap(); apply();
+      const dtms = now - lastMoveT;
+      if (dtms > 0) { const inst = -move / (dtms / 1000); velocity = velocity * 0.4 + inst * 0.6; }
+      lastX = t.clientX; lastMoveT = now;
+    }, { passive: false });
+    function endTouch() {
+      if (dragging && axis === "h") {
+        velocity = Math.max(-MAX_FLING, Math.min(MAX_FLING, velocity));
+        flinging = Math.abs(velocity) > 40;
+      }
+      dragging = false; axis = null;
+    }
+    viewport.addEventListener("touchend", endTouch);
+    viewport.addEventListener("touchcancel", endTouch);
 
     let rid;
     window.addEventListener("resize", () => { clearTimeout(rid); rid = setTimeout(measure, 150); });

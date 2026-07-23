@@ -23,15 +23,22 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
   const N = services.length;
   const COPIES = 3;
   const MAX_SPEED = 720;   // px/s al bordo estremo
-  const IDLE_SPEED = 20;   // deriva lenta quando il mouse è fuori
+  const IDLE_SPEED = 20;   // deriva lenta quando il mouse è fuori (solo desktop)
   const DEADZONE = 0.12;   // zona centrale ferma
+  const FRICTION = 0.94;   // attrito del momentum (più basso = frena prima)
+  const MAX_FLING = 3200;  // limite velocità del flick
+
+  // Su dispositivi touch niente deriva automatica: resta stabile finché non trascini.
+  const isTouch = window.matchMedia("(hover: none)").matches;
+  const idleSpeed = isTouch ? 0 : IDLE_SPEED;
 
   let pos = 0;
   let setWidth = 0;
   let velocity = 0;
   let targetVel = 0;
-  let idleDir = 1;
   let hovering = false;
+  let dragging = false;
+  let flinging = false;
   let lastTs = 0;
 
   function buildCard(service) {
@@ -96,27 +103,36 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
     edgeNext?.classList.toggle("active", targetVel > 1);
   }
 
+  function wrap() {
+    if (setWidth > 0) {
+      while (pos >= setWidth * 2) pos -= setWidth;
+      while (pos < setWidth) pos += setWidth;
+    }
+  }
+
   function frame(ts) {
     const dt = lastTs ? Math.min(48, ts - lastTs) : 16;
     lastTs = ts;
 
-    if (!reduceMotion) {
-      const goal = hovering ? targetVel : IDLE_SPEED * idleDir;
-      // avvicinamento morbido alla velocità obiettivo
-      velocity += (goal - velocity) * Math.min(1, dt / 180);
-      pos += velocity * (dt / 1000);
-
-      if (setWidth > 0) {
-        while (pos >= setWidth * 2) pos -= setWidth;
-        while (pos < setWidth) pos += setWidth;
+    if (!reduceMotion && !dragging) {
+      if (flinging) {
+        // Inerzia dopo il flick: scivola e frena dolcemente
+        pos += velocity * (dt / 1000);
+        velocity *= Math.pow(FRICTION, dt / 16.67);
+        if (Math.abs(velocity) <= idleSpeed + 2) { flinging = false; velocity = idleSpeed; }
+      } else {
+        const goal = hovering ? targetVel : idleSpeed;
+        velocity += (goal - velocity) * Math.min(1, dt / 180);
+        pos += velocity * (dt / 1000);
       }
+      wrap();
       apply();
     }
     requestAnimationFrame(frame);
   }
 
   viewport.addEventListener("mouseenter", () => { hovering = true; });
-  viewport.addEventListener("mousemove", (e) => { hovering = true; setTargetFromX(e.clientX); });
+  viewport.addEventListener("mousemove", (e) => { hovering = true; flinging = false; setTargetFromX(e.clientX); });
   viewport.addEventListener("mouseleave", () => {
     hovering = false;
     targetVel = 0;
@@ -124,27 +140,54 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
     edgeNext?.classList.remove("active");
   });
 
-  // Trascinamento touch
-  let dragging = false;
-  let dragStartX = 0;
-  let dragStartPos = 0;
+  // Trascinamento touch con momentum e blocco dell'asse
+  let axis = null;      // 'h' orizzontale (trascina), 'v' verticale (scroll pagina)
+  let startX = 0, startY = 0, lastX = 0, lastMoveT = 0;
   viewport.addEventListener("touchstart", (e) => {
     dragging = true;
+    flinging = false;
     hovering = false;
-    dragStartX = e.touches[0].clientX;
-    dragStartPos = pos;
+    axis = null;
+    const t = e.touches[0];
+    startX = lastX = t.clientX;
+    startY = t.clientY;
+    lastMoveT = performance.now();
     velocity = 0;
   }, { passive: true });
   viewport.addEventListener("touchmove", (e) => {
     if (!dragging) return;
-    pos = dragStartPos - (e.touches[0].clientX - dragStartX);
-    if (setWidth > 0) {
-      while (pos >= setWidth * 2) pos -= setWidth;
-      while (pos < setWidth) pos += setWidth;
+    const t = e.touches[0];
+    const dx = t.clientX - startX, dy = t.clientY - startY;
+    if (!axis) {
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) axis = Math.abs(dx) > Math.abs(dy) ? "h" : "v";
+      else return;
     }
+    if (axis === "v") { dragging = false; return; } // lascia scorrere la pagina
+    e.preventDefault(); // blocca sull'orizzontale: niente scatti con lo scroll
+    const now = performance.now();
+    const move = t.clientX - lastX;
+    pos -= move;
+    wrap();
     apply();
-  }, { passive: true });
-  viewport.addEventListener("touchend", () => { dragging = false; });
+    const dtms = now - lastMoveT;
+    if (dtms > 0) {
+      const inst = -move / (dtms / 1000);
+      // media pesata per una velocità stabile (meno "nervosa")
+      velocity = velocity * 0.4 + inst * 0.6;
+    }
+    lastX = t.clientX;
+    lastMoveT = now;
+  }, { passive: false });
+  function endTouch() {
+    if (dragging && axis === "h") {
+      velocity = Math.max(-MAX_FLING, Math.min(MAX_FLING, velocity));
+      flinging = Math.abs(velocity) > 40;
+    }
+    dragging = false;
+    axis = null;
+  }
+  viewport.addEventListener("touchend", endTouch);
+  viewport.addEventListener("touchcancel", endTouch);
 
   let resizeId;
   window.addEventListener("resize", () => {
