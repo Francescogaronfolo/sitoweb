@@ -52,6 +52,7 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
     img.loading = "lazy";
     img.decoding = "async";
     img.draggable = false;
+    if (service.coverPosition) img.style.objectPosition = service.coverPosition;
     img.addEventListener("error", () => { img.style.display = "none"; });
 
     const cap = document.createElement("div");

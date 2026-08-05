@@ -49,14 +49,81 @@ const SERVICES = [
     tag: "Photo & Video",
     title: "Luxury",
     cover: "assets/luxury/cover.jpg",
+    coverPosition: "92% center",
     intro:
       "Luxury interiors, yachts and exclusive spaces told through clean light, refined detail and a calm editorial rhythm.",
     operativo:
       "A focused visual selection for premium locations: elegant coverage of interiors, outdoor decks, materials and atmosphere, with images ready for portfolio and social presentation.",
     gallery: [
-      { src: "assets/luxury/detail-01.jpg", caption: "Marble bathroom, mirrored light and premium interior detail." },
-      { src: "assets/luxury/detail-02.jpg", caption: "Open deck and sea view, soft daylight luxury atmosphere." },
-      { src: "assets/luxury/detail-03.jpg", caption: "Yacht lounge with warm textures, sofa and relaxed composition." }
+      {
+        src: "assets/luxury/detail-03.jpg",
+        caption: "Yacht lounge with warm textures, sofa and relaxed composition.",
+        layout: "full-wide"
+      },
+      {
+        src: "assets/luxury/detail-01.jpg",
+        caption: "Marble bathroom, mirrored light and premium interior detail.",
+        layout: "vertical-pair",
+        position: "center center"
+      },
+      {
+        src: "assets/luxury/strip/01-vertical.jpg",
+        caption: "Illuminated corridor detail.",
+        layout: "vertical-pair",
+        position: "center center"
+      }
+    ],
+    strip: [
+      {
+        src: "assets/luxury/detail-02.jpg",
+        caption: "Open deck and sea view, soft daylight luxury atmosphere.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/02-deck.jpg",
+        caption: "Open yacht deck with marina view.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/03-sea-lounge.jpg",
+        caption: "Sea-facing lounge and deck tables.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/04-main-salon.jpg",
+        caption: "Bright main salon with soft architectural lighting.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/05-bridge.jpg",
+        caption: "Yacht bridge and navigation controls.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/06-controls.jpg",
+        caption: "Close control station detail.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/07-window-seat.jpg",
+        caption: "Window seat and interior reflections.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/08-side-deck.jpg",
+        caption: "Side deck line over the sea.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/09-cabin.jpg",
+        caption: "Cabin interior with warm ambient light.",
+        layout: "landscape"
+      },
+      {
+        src: "assets/luxury/strip/10-rail-detail.jpg",
+        caption: "Rail and sea detail.",
+        layout: "landscape"
+      }
     ]
   },
   {

@@ -38,21 +38,39 @@
   //   { video:"clip.mp4", poster:"p.jpg" }    -> video (autoplay muto in loop)
   const featured = (service.gallery || []).map((it) => {
     if (typeof it === "string") return { type: "image", src: it, caption: "" };
-    if (it && it.video) return { type: "video", src: it.video, poster: it.poster || "", caption: it.caption || "" };
-    if (it && it.src) return { type: "image", src: it.src, caption: it.caption || "" };
+    if (it && it.video) {
+      return {
+        type: "video",
+        src: it.video,
+        poster: it.poster || "",
+        caption: it.caption || "",
+        layout: it.layout || "",
+        position: it.position || ""
+      };
+    }
+    if (it && it.src) {
+      return {
+        type: "image",
+        src: it.src,
+        caption: it.caption || "",
+        layout: it.layout || "",
+        position: it.position || ""
+      };
+    }
     return null;
   }).filter(Boolean);
   const featuredImages = featured.filter((f) => f.type === "image").map((f) => ({ src: f.src, caption: f.caption }));
 
   const shots = featured.map((it, i) => {
-    const kind = i % 3 === 0 ? "wide" : i % 3 === 1 ? "tall" : "std";
+    const kind = it.layout || (i % 3 === 0 ? "wide" : i % 3 === 1 ? "tall" : "std");
+    const positionStyle = it.position ? ` style="--shot-position:${esc(it.position)}"` : "";
     if (it.type === "video") {
-      return `<figure class="shot ${kind} shot-video">
+      return `<figure class="shot ${kind} shot-video"${positionStyle}>
         <video src="${esc(it.src)}" ${it.poster ? `poster="${esc(it.poster)}"` : ""} autoplay muted loop playsinline></video>
       </figure>`;
     }
     const imgIdx = featuredImages.findIndex((x) => x.src === it.src);
-    return `<figure class="shot ${kind}" data-img="${imgIdx}" tabindex="0" role="button" aria-label="Open photo ${i + 1}">
+    return `<figure class="shot ${kind}" data-img="${imgIdx}" tabindex="0" role="button" aria-label="Open photo ${i + 1}"${positionStyle}>
       <img src="${esc(it.src)}" alt="${esc(it.caption || service.title)}" loading="lazy" decoding="async" />
     </figure>`;
   }).join("");
@@ -62,7 +80,7 @@
     : "";
 
   root.innerHTML = `
-    <section class="cat-head" style="--cover:url('${esc(service.cover)}')">
+    <section class="cat-head" style="--cover:url('${esc(service.cover)}');--cover-position:${esc(service.coverPosition || "center")}">
       <div class="cat-head-scrim"></div>
       <a class="cat-back" href="index.html#portfolio">← All services</a>
       <div class="cat-head-inner">
@@ -140,7 +158,7 @@
 
     function buildTile(item, index) {
       const tile = document.createElement("button");
-      tile.className = "strip-tile";
+      tile.className = `strip-tile ${item.layout === "vertical" ? "vertical" : "landscape"}`;
       tile.type = "button";
       tile.setAttribute("aria-label", `Open photo ${index + 1}`);
       const img = document.createElement("img");
@@ -161,9 +179,8 @@
 
     function measure() {
       const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-      const tile = track.children[0];
-      const w = tile ? tile.getBoundingClientRect().width : 0;
-      setWidth = (w + gap) * N;
+      const firstSet = Array.from(track.children).slice(0, N);
+      setWidth = firstSet.reduce((sum, tile) => sum + tile.getBoundingClientRect().width, 0) + gap * Math.max(0, N - 1);
       if (setWidth > 0) { pos = ((pos % setWidth) + setWidth) % setWidth; if (pos < setWidth) pos += setWidth; }
       apply();
     }
