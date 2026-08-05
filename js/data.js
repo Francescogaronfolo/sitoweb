@@ -45,18 +45,18 @@ const SERVICES = [
     ]
   },
   {
-    slug: "brand",
-    tag: "Video",
-    title: "Brand Story",
-    cover: "assets/gallery/03-brand-story.jpg",
+    slug: "luxury",
+    tag: "Photo & Video",
+    title: "Luxury",
+    cover: "assets/luxury/cover.jpg",
     intro:
-      "Content for companies and businesses: visual identity, product and people told with elegance.",
+      "Luxury interiors, yachts and exclusive spaces told through clean light, refined detail and a calm editorial rhythm.",
     operativo:
-      "Brand analysis, storyboard, shooting in studio or on site, editing and a package of social content. Focus on aesthetic consistency and message.",
+      "A focused visual selection for premium locations: elegant coverage of interiors, outdoor decks, materials and atmosphere, with images ready for portfolio and social presentation.",
     gallery: [
-      "assets/gallery/03-brand-story.jpg",
-      "assets/gallery/06-commercial.jpg",
-      "assets/gallery/08-editorial-photo.jpg"
+      { src: "assets/luxury/detail-01.jpg", caption: "Marble bathroom, mirrored light and premium interior detail." },
+      { src: "assets/luxury/detail-02.jpg", caption: "Open deck and sea view, soft daylight luxury atmosphere." },
+      { src: "assets/luxury/detail-03.jpg", caption: "Yacht lounge with warm textures, sofa and relaxed composition." }
     ]
   },
   {
